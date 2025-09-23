@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+model Supplier {
+    id Int @id @default(autoincrement())
+    name String
+    email String @unique
+    chemicals Chemical[]
+}
+
+model Chemical {
+    id Int @id @default(autoincrement())
+    name String
+    nomenclature_name String?
+    stock_quantity Float // Float chosen to allow fractional quantities. Only use one unit for different states of material (ie. g for solid, ml for liquids. these can be converted client side to more readable units.)
+    unit Unit
+    created_on_at DateTime @default(now())
+    modified_on_at DateTime @updatedAt
+    status Status
+    supplier_id Int
+    supplier Supplier @relation(fields: [supplier_id], references: [id])
+    location_id Int?
+    location Location? @relation(fields: [location_id], references: [id])
+    hazard_class_id Int?
+    hazard_class HazardClass? @relation(fields: [hazard_class_id], references: [id])
+}
+
+model Location {
+    id Int @id @default(autoincrement())
+    address String
+    code    String  // Post code, zip code.
+    town    String
+    country String
+    chemicals Chemical[]
+}
+
+model HazardClass {
+    id Int @id @default(autoincrement())
+    classification String
+    chemicals Chemical[]
+}
+
+
+enum Unit {
+    g
+    ml
+}
+
+enum Status {
+    REQUESTED
+    APPROVED
+    DISPENSED
+    ARCHIVED
+}
