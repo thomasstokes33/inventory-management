@@ -21,18 +21,21 @@ model Supplier {
 model Chemical {
     id Int @id @default(autoincrement())
     name String
-    nomenclature_name String?
-    stock_quantity Float // Float chosen to allow fractional quantities. Only use one unit for different states of material (ie. g for solid, ml for liquids. these can be converted client side to more readable units.)
-    unit Unit
-    created_on_at DateTime @default(now())
-    modified_on_at DateTime @updatedAt
+    nomenclatureName String?
+    stockQuantity Float // Float chosen to allow fractional quantities. Only use one unit for different states of material (ie. g for solid, ml for liquids. these can be converted client side to more readable units.)
+    quantityType QuantityType 
+    unit String? // Allows for extra details (e.g. cinammon "sticks")
+    createdAt DateTime @default(now())
+    modifiedAt DateTime @updatedAt
     status Status
-    supplier_id Int
-    supplier Supplier @relation(fields: [supplier_id], references: [id])
-    location_id Int?
-    location Location? @relation(fields: [location_id], references: [id])
-    hazard_class_id Int?
-    hazard_class HazardClass? @relation(fields: [hazard_class_id], references: [id])
+    supplierId Int
+    supplier Supplier @relation(fields: [supplierId], references: [id])
+    locationId Int?  // Optional as it may not yet be approved.
+    location Location? @relation(fields: [locationId], references: [id])
+    hazardClassId Int?  // May not be hazardous.
+    hazardClass HazardClass? @relation(fields: [hazardClassId], references: [id])
+    @@index([name])
+    @@index([status])
 }
 
 model Location {
@@ -51,9 +54,10 @@ model HazardClass {
 }
 
 
-enum Unit {
-    g
-    ml
+enum QuantityType {
+    MASS
+    VOLUME
+    COUNT
 }
 
 enum Status {
