@@ -26,6 +26,13 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
          <table className="table">
+            <thead>
+                <tr>
+                    {chemicalTableColumns.map((col) => (
+                        <td scope="col" key={col.field}>{col.label}</td>))
+                    }
+                </tr>
+            </thead>
             <tbody>
                 {
                     chemicals.map( chemical => (
