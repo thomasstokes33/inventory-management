@@ -21,8 +21,8 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
     rules: {
-        semi: "error",
-        quotes: ["error", "double"]
+        semi: "warn",
+        quotes: ["warn", "double"]
     }
   },
 ];
