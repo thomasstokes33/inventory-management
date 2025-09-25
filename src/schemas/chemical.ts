@@ -8,7 +8,7 @@ import { LocationSchema } from "./location";
 export const chemicalSchema = z.object({
     id: z.number().describe("id"),
     name: z.string().describe("name"),
-    stockQuantity: z.number().nullable().describe("stock"),
+    stockQuantity: z.number().nonnegative().describe("stock"),
     quantityType: z.enum(QuantityType),
     unit: z.string().nullable().describe("Special unit if it is unusual, such as sticks or bars, rather than grams."),
     status: z.enum(Status),
@@ -18,4 +18,3 @@ export const chemicalSchema = z.object({
 });
 
 export type ChemicalRow = z.infer<typeof chemicalSchema>;
-
