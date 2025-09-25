@@ -9,26 +9,10 @@ type TableColumn<T, K extends keyof T = keyof T> = {
 };
 export const chemicalTableColumns: TableColumn<ChemicalRow>[] = [
     { field: "name", label: "Name" },
-      {  field: "stockQuantity", label: "Stock", format: (c: ChemicalRow) => {
-            let displayVal;
-            switch (c.quantityType) {
-                case "MASS":
-                    displayVal = `${c.stockQuantity} ${c.unit ?? ""}`;
-                    break;
-                case "MASS":
-                    displayVal = `${c.stockQuantity} g`;
-                    break;
-                case "VOLUME":
-                    displayVal = `${c.stockQuantity} ml`;
-                    break;
-                default:
-                    displayVal = "";
-                    break;
-            }
-            return displayVal;
-        },
-      },
-      { field: "status", label: "Status" },
+    {
+        field: "stockQuantity", label: "Stock", format: (c: ChemicalRow) => (<EditableStock chemical={c} />)
+    },
+    { field: "status", label: "Status" },
     {
         field: "supplier", label: "Supplier", format: (c: ChemicalRow) => {
             return c.supplier.name;
