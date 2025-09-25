@@ -38,8 +38,3 @@ npx prisma migrate dev --name init
 ```
 (Note: you can access the DB with prisma, using `npx prisma studio`).
 Finally, run the server with `npm run dev`.
-
-
-# Boilerplate README...
-<hr>
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
