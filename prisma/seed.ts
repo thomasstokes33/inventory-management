@@ -26,7 +26,7 @@ const hazardClasses: Prisma.HazardClassCreateInput[] = [
     { classification: "Miscellaneous dangerous goods" }
 ];
 export async function main() {
-    const supplierMap : Map<string, number> = new Map();
+    const supplierMap: Map<string, number> = new Map();
     for (const haz of hazardClasses) {
         await prisma.hazardClass.create({ data: haz });
     }
@@ -39,7 +39,14 @@ export async function main() {
         stockQuantity: 19.8,
         quantityType: "VOLUME",
         status: "APPROVED",
-        supplier: { connect: {  id: supplierMap.get(sampleSuppliers[0].name)} }
+        supplier: { connect: { id: supplierMap.get(sampleSuppliers[0].name) } }
+    },
+    {
+        name: "chocolate",
+        stockQuantity: 1000,
+        quantityType: "MASS",
+        status: "DISPENSED",
+        supplier: { connect: { id: supplierMap.get(sampleSuppliers[0].name) } }
     }];
     for (const u of newChemicals) {
         await prisma.chemical.create({
