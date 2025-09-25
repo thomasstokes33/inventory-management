@@ -1,53 +1,24 @@
-"use client";
 import Image from "next/image";
 import styles from "./page.module.css";
-import { useEffect, useState } from "react";
-import { Chemical } from "@prisma/client";
-import { chemicalTableColumns } from "@/schemas/chemical";
+import { ChemicalRow, chemicalSchema } from "@/schemas/chemical";
+import prisma from "@/lib/prisma";
+import ChemicalTable from "./client/chemicalsTableClient";
 
 
 
-export default function Home() {
-
-
-    const [chemicals, setChemicals] = useState<Chemical[]>([]);
-    useEffect(() => {
-        async function fetchChemicals() {
-            const res = await fetch("/api/chemicals");
-            if (!res.ok) throw new Error("Failed to fetch chems");
-            const data: Chemical[] = await res.json();
-            setChemicals(data);
+export default async function Home() {
+    const chemicalsRaw = await prisma.chemical.findMany({
+        include: {
+            supplier: true,
+            location: true,
+            hazardClass: true
         }
-        fetchChemicals();
-    }, []);
-    
-    console.log(chemicals);
+    });
+    const chemicals: ChemicalRow[] = chemicalsRaw.map(chem => chemicalSchema.parse(chem));
     return (
     <div className={styles.page}>
       <main className={styles.main}>
-         <table className="table">
-            <thead>
-                <tr>
-                    {chemicalTableColumns.map((col) => (
-                        <td scope="col" key={col.field}>{col.label}</td>))
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                {
-                    chemicals.map( chemical => (
-                        <tr key={chemical.id}>
-                            <td>{chemical.name}</td>
-                            <td>{chemical.stockQuantity}</td>
-                            <td>{chemical.status}</td>
-                            <td>{chemical.supplierId}</td>
-                            <td>{chemical.locationId}</td>
-                            <td>{chemical.hazardClassId}</td>
-                        </tr>
-                    ))
-                }
-            </tbody>
-         </table>
+        <ChemicalTable initialChems={chemicals}/>
       </main>
       <footer className={styles.footer}>
         <a
