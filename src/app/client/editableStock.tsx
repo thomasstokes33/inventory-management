@@ -1,6 +1,6 @@
 "use client";
 
-import { ChemicalRow } from "@/schemas/chemical";
+import { ChemicalRow, chemicalSchema } from "@/schemas/chemical";
 import { useState } from "react";
 
 type editableStockProps = {
@@ -25,20 +25,22 @@ export default function EditableStock({ chemical }: editableStockProps) {
             displayVal = "";
             break;
     }
+    const stockSchema = chemicalSchema.pick( {stockQuantity: true});
     const save = async (val: string) => {
-        console.log(val);
-        if (val !== "" && Number.isFinite(Number(val)) && Number(val) >= 0) {
+        if (val !== "") {
             const number = Number(val);
-            setStock(number);
-            await fetch(`/api/chemicals/${chemical.id}`, {
-                method: "PUT",
-                body: JSON.stringify({ stockQuantity: number }),
-                headers: { "Content-Type": "application/json" }
-            });
-        } 
+            const result = stockSchema.safeParse({ stockQuantity: number });
+            if (result.success) {
+                setStock(number);
+                await fetch(`/api/chemicals/${chemical.id}`, {
+                    method: "PUT",
+                    body: JSON.stringify({ stockQuantity: number }),
+                    headers: { "Content-Type": "application/json" }
+                });
+            }
+        }
         setEditing(false);
     };
-
     return (editing ?
         (<div className="input-group">
             <input id="stock-update-inline" className="form-control" type="number" defaultValue={stock} onBlur={(event) => save(event.target.value)}

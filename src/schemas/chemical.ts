@@ -6,7 +6,7 @@ import { LocationSchema } from "./location";
 
 
 export const chemicalSchema = z.object({
-    id: z.number().describe("id"),
+    id: z.number().nonnegative().describe("id"),
     name: z.string().describe("name"),
     stockQuantity: z.number().nonnegative().describe("stock"),
     quantityType: z.enum(QuantityType),
