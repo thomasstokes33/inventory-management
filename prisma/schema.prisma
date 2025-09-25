@@ -33,7 +33,7 @@ model Chemical {
     locationId Int?  // Optional as it may not yet be approved.
     location Location? @relation(fields: [locationId], references: [id])
     hazardClassId Int?  // May not be hazardous.
-    hazardClass HazardClass? @relation(fields: [hazardClassId], references: [id])
+    hazardClass HazardClass[]
     @@index([name])
     @@index([status])
 }
@@ -42,8 +42,8 @@ model Location {
     id Int @id @default(autoincrement())
     address String
     code    String  // Post code, zip code.
-    town    String
-    country String
+    town    String?
+    country String?
     chemicals Chemical[]
 }
 
