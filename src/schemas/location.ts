@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const LocationSchema = z.object({
-    id: z.int(),
+    id: z.int().nonnegative(),
     address: z.string(),
     code: z.string(),
     town: z.string().nullable(),

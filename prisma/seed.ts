@@ -36,17 +36,16 @@ export async function main() {
     }
     const newChemicals: Prisma.ChemicalCreateInput[] = [{
         name: "vanilla extract",
-        stockQuantity: 19.8,
         quantityType: "VOLUME",
         status: "APPROVED",
-        supplier: { connect: { id: supplierMap.get(sampleSuppliers[0].name) } }
-    },
+        materialType: "RAW"
+    }
+    ,
     {
         name: "chocolate",
-        stockQuantity: 1000,
         quantityType: "MASS",
-        status: "DISPENSED",
-        supplier: { connect: { id: supplierMap.get(sampleSuppliers[0].name) } }
+        status: "APPROVED",
+        materialType: "RAW"
     }];
     for (const u of newChemicals) {
         await prisma.chemical.create({

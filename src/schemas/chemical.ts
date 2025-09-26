@@ -1,20 +1,15 @@
 import z from "zod";
-import { QuantityType, Status } from "@prisma/client";
-import { supplierSchema } from "./supplier";
+import { MaterialType, QuantityType, Status } from "@prisma/client";
 import { HazardSchema } from "./hazardClass";
-import { LocationSchema } from "./location";
-
 
 export const chemicalSchema = z.object({
-    id: z.number().nonnegative().describe("id"),
-    name: z.string().describe("name"),
-    stockQuantity: z.number().nonnegative().describe("stock"),
-    quantityType: z.enum(QuantityType),
-    unit: z.string().nullable().describe("Special unit if it is unusual, such as sticks or bars, rather than grams."),
+    id: z.number().nonnegative(),
+    name: z.string(),
     status: z.enum(Status),
-    location: LocationSchema.nullable(),
-    supplier: supplierSchema,
-    hazardClass: z.array(HazardSchema)
+    hazardClass: z.array(HazardSchema),
+    quantityType: z.enum(QuantityType),
+    materialType: z.enum(MaterialType),
+    unit: z.string().nullable()
 });
 
 export type ChemicalRow = z.infer<typeof chemicalSchema>;
