@@ -1,14 +1,14 @@
 import prisma from "@/lib/prisma";
 import ChemicalsTable from "./components/chemicalsTable";
 import CreateChemical from "./components/createChemical";
-import { ChemicalRow, chemicalSchema } from "@/schemas/chemical";
+import { ChemicalRecord, chemicalSchema } from "@/schemas/chemical";
 
 export default async function ChemicalDashboard() {
     const initialRawChems = await prisma.chemical.findMany({
         include: {hazardClass: true
         }
     });
-    const initialChems : ChemicalRow[] = initialRawChems.map (chem => chemicalSchema.parse(chem));
+    const initialChems : ChemicalRecord[] = initialRawChems.map (chem => chemicalSchema.parse(chem));
     return (
         <div className="container-lg mt-5">
             <div className="row">

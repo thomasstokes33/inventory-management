@@ -14,4 +14,4 @@ export const chemicalSchema = z.object({
     updatedAt: z.date()
 });
 
-export type ChemicalRow = z.infer<typeof chemicalSchema>;
+export type ChemicalRecord = z.infer<typeof chemicalSchema>;

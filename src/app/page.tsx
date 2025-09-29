@@ -1,6 +1,6 @@
 import Image from "next/image";
 import styles from "./page.module.css";
-import { ChemicalRow, chemicalSchema } from "@/schemas/chemical";
+import { ChemicalRecord, chemicalSchema } from "@/schemas/chemical";
 import prisma from "@/lib/prisma";
 import CountCard from "./components/countCard";
 import StatsCard from "./components/statsCard";
@@ -20,7 +20,7 @@ export default async function Home() {
             updatedAt: { gte: date }
         }
     });
-    const chemicalsRecent: ChemicalRow[] = chemicalsRecentRaw.map(chem => chemicalSchema.parse(chem));
+    const chemicalsRecent: ChemicalRecord[] = chemicalsRecentRaw.map(chem => chemicalSchema.parse(chem));
     const chemicalsCount = await prisma.chemical.count();
     const supplierCount = await prisma.supplier.count();
     return (
@@ -34,7 +34,7 @@ export default async function Home() {
                         <CountCard title="Total Suppliers" count={supplierCount} />
                     </div>
                 </div>
-                <StatsCard<ChemicalRow> title={`Latest Chemicals (${daysOfCreatedChemicals} days)`} items={chemicalsRecent} renderItem={item => {
+                <StatsCard<ChemicalRecord> title={`Latest Chemicals (${daysOfCreatedChemicals} days)`} items={chemicalsRecent} renderItem={item => {
                     return `${item.name} - ${item.status} - ${item.updatedAt.toLocaleDateString()}`;
                 }
                 } />
