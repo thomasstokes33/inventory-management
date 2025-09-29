@@ -17,7 +17,6 @@ export default function CreateChemical() {
         setSuccess(null);
         const form = e.currentTarget;
         const formData = new FormData(form);
-        console.log(e.currentTarget.quantityType.value);
         const res = await fetch("/api/chemicals", {
             method: "POST",
             body: formData
@@ -28,7 +27,6 @@ export default function CreateChemical() {
             setMessage("Successfully added chemical");
             form.reset();
         } else {
-            console.log(data);
             setSuccess(false);
             setMessage("Could not create chemical");
         }

@@ -11,7 +11,6 @@ export async function GET() {
 const chemicalCreationSchema = chemicalSchema.pick({ name: true, quantityType: true, status: true, materialType: true, unit: true }).partial({unit:true});
 export async function POST(request: Request) {
     const formData = await request.formData();
-    console.log(formData);
     const newChemical: Record<string, string> = {};
     for (const pair of formData) {
         if (typeof pair[1] == "string" && pair[1].length > 0) {
@@ -20,7 +19,6 @@ export async function POST(request: Request) {
             console.warn(`Skipping field: ${pair[0]}`);
         }
     }
-    console.log(newChemical);
     const res = chemicalCreationSchema.safeParse(newChemical);
     let response: NextResponse;
     if (!res.success) {

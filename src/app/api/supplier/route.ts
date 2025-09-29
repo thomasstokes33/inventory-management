@@ -5,7 +5,6 @@ import z from "zod";
 
 export async function POST(request: Request) {
     const formData = await request.formData();
-    console.log(formData);
     const newSupplier: Record<string, string> = {};
     for (const pair of formData) {
         if (typeof pair[1] == "string" && pair[1].length > 0) {
@@ -14,7 +13,6 @@ export async function POST(request: Request) {
             console.warn(`Skipping field: ${pair[0]}`);
         }
     }
-    console.log(newSupplier);
     const res = supplierSchema.safeParse(newSupplier);
     let response: NextResponse;
     if (!res.success) {
