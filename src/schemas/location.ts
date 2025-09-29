@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const LocationSchema = z.object({
+export const locationSchema = z.object({
     id: z.int().nonnegative(),
     address: z.string(),
     code: z.string(),

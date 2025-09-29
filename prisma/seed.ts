@@ -52,6 +52,7 @@ export async function main() {
             data: u
         });
     }
+    await prisma.location.create({data: {address: "221B Baker Street", code: "4224"}});
 }
 
 main();
