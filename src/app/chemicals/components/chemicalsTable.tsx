@@ -75,6 +75,11 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
     const [chemical, setChemical] = useState(initialChemical);
     const [draft, setDraft] = useState(initialChemical);
     const [updateStatus, setUpdateStatus] = useState<UpdateStatusVals>(UpdateStatusVals.IDLE);
+    const handleFieldChanged = <K extends keyof ChemicalRecord>(key: K, value: ChemicalRecord[K]) => {
+        const newState = { ...draft, [key]: value };
+        console.log(newState);
+        setDraft(newState);
+    };
         setEditing(false);
     const renderStatusIcon = () => {
         return (
@@ -86,9 +91,14 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
         );
     };
     return (<tr>
-        {chemicalTableColumns.map(({ field, format }) => (
+        {chemicalTableColumns.map(({ field, format, formatEditable }) => (
             <td key={field}>
-                {format ? format(chemical) : chemical[field]?.toString()}
+                {isEditing && formatEditable
+                    ? formatEditable(chemical, (value) => handleFieldChanged(field, value))
+                    : format
+                        ? format(chemical)
+                        : chemical[field]?.toString()
+                }
             </td>
         ))
         }
@@ -97,7 +107,7 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
                 isEditing ? (
                     <div className="btn-group" role="group">
                         <button className="btn btn-outline-primary" onMouseUp={saveRow}>Save</button>
-                        <button className="btn btn-outline-primary" onMouseUp={() => setEditing(false)}>Cancel</button>
+                        <button className="btn btn-outline-secondary" onClick={() => {setDraft(chemical); setEditing(false);}}>Cancel</button>
                     </div>
                 ) : (
                     <div className="btn-group" role="group">
