@@ -6,7 +6,7 @@ import { ChemicalRecord, chemicalSchema } from "@/schemas/chemical";
 export default async function ChemicalDashboard() {
     const initialRawChems = await prisma.chemical.findMany({
         include: {hazardClass: true
-        }
+        }, where: {status: {not: "ARCHIVED"}} 
     });
     const initialChems : ChemicalRecord[] = initialRawChems.map (chem => chemicalSchema.parse(chem));
     return (
