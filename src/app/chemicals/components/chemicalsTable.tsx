@@ -68,13 +68,23 @@ export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
     );
 }
 
-
+enum UpdateStatusVals { SUCCESS, ERROR, IDLE }
 type ChemicalRowProps = { initialChemical: ChemicalRecord, router : AppRouterInstance }
 export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
     const [isEditing, setEditing] = useState<boolean>(false);
     const [chemical, setChemical] = useState(initialChemical);
+    const [draft, setDraft] = useState(initialChemical);
+    const [updateStatus, setUpdateStatus] = useState<UpdateStatusVals>(UpdateStatusVals.IDLE);
         setEditing(false);
-    }
+    const renderStatusIcon = () => {
+        return (
+            <span>{updateStatus === UpdateStatusVals.SUCCESS
+                ? "✅"
+                : updateStatus === UpdateStatusVals.ERROR
+                    ? "❌"
+                    : null}</span>
+        );
+    };
     return (<tr>
         {chemicalTableColumns.map(({ field, format }) => (
             <td key={field}>
@@ -96,6 +106,7 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
                     </div>
                 )
             }
+            {renderStatusIcon()}
         </td>
 
     </tr>);
