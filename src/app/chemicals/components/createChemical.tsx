@@ -66,7 +66,7 @@ export default function CreateChemical({hazardClasses} : CreateChemicalProps) {
                     </select>
                     <div>
                         <label>Count unit (only used if Quantity type is &quot;count&quot;)</label>
-                        <input name="unit" type="number" className="form-control" required={false} />
+                        <input name="unit" type="string" className="form-control" required={false} />
                     </div>
                     <div className="mt-2">
                         <button type="submit" className="btn btn-primary me-2">Add Chemical</button>
