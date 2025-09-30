@@ -80,7 +80,26 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
         console.log(newState);
         setDraft(newState);
     };
+    const saveRow = async () => {
+        const res = await fetch(`/api/chemicals/${chemical.id}`,
+            {
+                method: "POST",
+                body: JSON.stringify(draft)
+            }
+        );
+        if (res.ok) {
+            setChemical(draft);
+            setDraft(draft);
+            setUpdateStatus(UpdateStatusVals.SUCCESS);
+        } else {
+            setUpdateStatus(UpdateStatusVals.ERROR);
+        }
+        setTimeout(() => {
+            setUpdateStatus(UpdateStatusVals.IDLE);
+        }, 1000);
         setEditing(false);
+        router.refresh();
+    };
     const renderStatusIcon = () => {
         return (
             <span>{updateStatus === UpdateStatusVals.SUCCESS
@@ -106,7 +125,7 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
             {
                 isEditing ? (
                     <div className="btn-group" role="group">
-                        <button className="btn btn-outline-primary" onMouseUp={saveRow}>Save</button>
+                        <button className="btn btn-outline-primary" onClick={saveRow}>Save</button>
                         <button className="btn btn-outline-secondary" onClick={() => {setDraft(chemical); setEditing(false);}}>Cancel</button>
                     </div>
                 ) : (
