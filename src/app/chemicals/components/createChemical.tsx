@@ -19,7 +19,7 @@ export default function CreateChemical({hazardClasses} : CreateChemicalProps) {
         const form = e.currentTarget;
         const formData = new FormData(form);
         const res = await fetch("/api/chemicals", {
-            method: "POST",
+            method: "PUT",
             body: formData
         });
         const data = await res.json();
@@ -38,7 +38,7 @@ export default function CreateChemical({hazardClasses} : CreateChemicalProps) {
                 Add new Chemical
             </div>
             <div className="card-body">
-                <form method="post" onSubmit={handleCreateSubmit}>
+                <form method="PUT" onSubmit={handleCreateSubmit}>
                     <label>Name</label>
                     <input name="name" type="text" className="form-control" required />
                     <label>Status</label>
