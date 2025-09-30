@@ -1,8 +1,9 @@
 "use client";
 import { ChemicalRecord } from "@/schemas/chemical";
 import { MaterialType, Status } from "@prisma/client";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-
 type TableColumn<T, K extends keyof T = keyof T> = {
     field: K;
     label: string;
@@ -40,6 +41,7 @@ export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
 type ChemicalsTableProps = { initialChems: ChemicalRecord[] }
 export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
     const [searchVal, setSearchVal] = useState<string>("");
+    const router = useRouter();
     return (
         <div className="container-xxl">
             <div className="input-group">
@@ -57,7 +59,7 @@ export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
                     </thead>
                     <tbody>
                         {initialChems.filter((chemical) => (chemical.name.toLowerCase().includes(searchVal))).map((chemical: ChemicalRecord) => (
-                            <ChemicalRow key={chemical.id} chemical={chemical} />
+                            <ChemicalRow router={router} key={chemical.id} initialChemical={chemical} />
                         ))}
                     </tbody>
                 </table>
@@ -67,11 +69,10 @@ export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
 }
 
 
-type ChemicalRowProps = { chemical: ChemicalRecord }
-export function ChemicalRow({ chemical }: ChemicalRowProps) {
+type ChemicalRowProps = { initialChemical: ChemicalRecord, router : AppRouterInstance }
+export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
     const [isEditing, setEditing] = useState<boolean>(false);
-    const [state, setState] = useState(chemical);
-    async function saveRow() {
+    const [chemical, setChemical] = useState(initialChemical);
         setEditing(false);
     }
     return (<tr>
