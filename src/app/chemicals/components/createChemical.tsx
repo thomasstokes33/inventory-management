@@ -1,15 +1,15 @@
 "use client";
 
 import { HazardClass, MaterialType, QuantityType, Status } from "@prisma/client";
-import { Router } from "next/router";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import z, { set } from "zod";
 
 
 
 
 type CreateChemicalProps = {hazardClasses : HazardClass[]}
 export default function CreateChemical({hazardClasses} : CreateChemicalProps) {
+    const router = useRouter();
     const [message, setMessage] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean| null>(null);
     async function handleCreateSubmit(e: FormEvent<HTMLFormElement>) {
@@ -27,6 +27,7 @@ export default function CreateChemical({hazardClasses} : CreateChemicalProps) {
             setSuccess(true);
             setMessage("Successfully added chemical");
             form.reset();
+            router.refresh(); // reloads components without reloading page.
         } else {
             setSuccess(false);
             setMessage("Could not create chemical");
