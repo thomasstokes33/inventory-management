@@ -1,21 +1,40 @@
 "use client";
 import { ChemicalRecord } from "@/schemas/chemical";
+import { MaterialType, Status } from "@prisma/client";
 import { useState } from "react";
 
 type TableColumn<T, K extends keyof T = keyof T> = {
     field: K;
     label: string;
     format?: (value: T) => React.ReactNode;
+    formatEditable?: (value: T, onChangeHandler: (value: string) => void) => React.ReactNode;
 };
 export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
     { field: "name", label: "Name" },
-    { field: "status", label: "Status" },
     {
-        field: "hazardClass", label: "Hazard class", format: (c: ChemicalRecord) => (
-
-            c.hazardClass.length ? c.hazardClass.map(({ classification }) => (classification)).join(", ") : <em>No classification</em>)
+        field: "status", label: "Status", formatEditable: (chemical, onChangeHandler) => {
+            return (<select className="form-select" defaultValue={chemical.status} onChange={(e) => onChangeHandler(e.target.value)}>
+                {Object.values(Status).map((status) =>
+                    <option key={status} value={status}>{status.toLowerCase()}</option>)}
+            </select>);
+        }
     },
-    { field: "materialType", label: "Material Type", },
+    {
+        field: "hazardClass", label: "Hazard class",
+        format: (c: ChemicalRecord) =>
+        (c.hazardClass.length ?
+            c.hazardClass.map(({ classification }) => (classification)).join(", ")
+            : <em>No classification</em>),
+
+    },
+    {
+        field: "materialType", label: "Material Type", formatEditable: (chemical, onChangeHandler) => {
+            return (<select className="form-select" defaultValue={chemical.status} onChange={(e) => onChangeHandler(e.target.value)}>
+                {Object.values(MaterialType).map((materialType) =>
+                    <option key={materialType} value={materialType}>{materialType.toLowerCase()}</option>)}
+            </select>);
+        }
+    },
 ];
 
 type ChemicalsTableProps = { initialChems: ChemicalRecord[] }
