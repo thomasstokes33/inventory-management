@@ -80,6 +80,14 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
         console.log(newState);
         setDraft(newState);
     };
+    const archive = async () => {
+        const archivedChemical = { ...chemical, status: "ARCHIVED" };
+        await fetch(`/api/chemicals/${chemical.id}`, {
+            method: "POST",
+            body: JSON.stringify(archivedChemical)
+        });
+        router.refresh();
+    };
     const saveRow = async () => {
         const res = await fetch(`/api/chemicals/${chemical.id}`,
             {
@@ -132,6 +140,7 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
                     <div className="btn-group" role="group">
                         <button className="btn btn-outline-primary" onClick={() => setEditing(true)}>Edit</button>
                         <button className="btn btn-outline-primary">Transfer</button>
+                        <button className="btn btn-outline-primary" onClick={archive}>Archive</button>
                     </div>
                 )
             }
