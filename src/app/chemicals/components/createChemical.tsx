@@ -1,6 +1,6 @@
 "use client";
 
-import { MaterialType, QuantityType, Status } from "@prisma/client";
+import { HazardClass, MaterialType, QuantityType, Status } from "@prisma/client";
 import { Router } from "next/router";
 import { FormEvent, useState } from "react";
 import z, { set } from "zod";
@@ -8,7 +8,8 @@ import z, { set } from "zod";
 
 
 
-export default function CreateChemical() {
+type CreateChemicalProps = {hazardClasses : HazardClass[]}
+export default function CreateChemical({hazardClasses} : CreateChemicalProps) {
     const [message, setMessage] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean| null>(null);
     async function handleCreateSubmit(e: FormEvent<HTMLFormElement>) {
@@ -45,6 +46,10 @@ export default function CreateChemical() {
                         {Object.values(Status).map((value) => (
                             <option key={value} value={value}>{value.toLowerCase()}</option>
                         ))}
+                    </select>
+                    <label>Hazard classes</label>
+                    <select  name="hazardClass" className="form-select" multiple> 
+                        {hazardClasses.map((hazardClass, key) => (<option key={key} value={hazardClass.id}>{hazardClass.classification}</option>))}
                     </select>
                     <label>Material</label>
                     <select name="materialType" className="form-select">
