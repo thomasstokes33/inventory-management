@@ -5,11 +5,14 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
+
+type HideBelowOptions = "sm" | "md" | "lg" | "xl"
 type TableColumn<T, K extends keyof T = keyof T> = {
     field: K;
     label: string;
     format?: (value: T) => React.ReactNode;
     formatEditable?: (value: T, onChangeHandler: (value: string) => void) => React.ReactNode;
+    hideBelow?: HideBelowOptions;
 };
 export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
     { field: "name", label: "Name" },
@@ -19,7 +22,8 @@ export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
                 {Object.values(Status).map((status) =>
                     <option key={status} value={status}>{status.toLowerCase()}</option>)}
             </select>);
-        }
+        },
+        hideBelow: "sm"
     },
     {
         field: "hazardClass", label: "Hazard class",
@@ -27,6 +31,7 @@ export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
         (c.hazardClass.length ?
             c.hazardClass.map(({ classification }) => (classification)).join(", ")
             : <em>No classification</em>),
+        hideBelow: "sm"
 
     },
     {
@@ -35,9 +40,23 @@ export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
                 {Object.values(MaterialType).map((materialType) =>
                     <option key={materialType} value={materialType}>{materialType.toLowerCase()}</option>)}
             </select>);
-        }
+        },
+        hideBelow: "sm"
     },
 ];
+
+function getCellClass(hideBelow?: HideBelowOptions) {
+    if (!hideBelow) return "";
+    return `d-none d-${hideBelow}-table-cell`;
+}
+
+const checkResponse = async (response: Response) => {
+    if (response.ok) {
+        return response.json();
+    } else {
+        throw new Error(response.statusText);
+    }
+};
 
 type ChemicalsTableProps = { initialChems: ChemicalRecord[] }
 export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
@@ -53,7 +72,7 @@ export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
                     <thead className="table-dark">
                         <tr>
                             {chemicalTableColumns.map((col) => (
-                                <td key={col.field}>{col.label}</td>
+                                <td key={col.field} className={getCellClass(col.hideBelow)}>{col.label}</td>
                             ))}
                             <td>Actions</td>
                         </tr>
@@ -68,13 +87,7 @@ export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
         </div>
     );
 }
-const checkResponse = async (response: Response) => {
-    if (response.ok) {
-        return response.json();
-    } else {
-        throw new Error(response.statusText);
-    }
-};
+
 type ChemicalRowProps = { initialChemical: ChemicalRecord, router : AppRouterInstance }
 export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
     const [isEditing, setEditing] = useState<boolean>(false);
@@ -121,8 +134,8 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
         setEditing(false);
     };
     return (<tr>
-        {chemicalTableColumns.map(({ field, format, formatEditable }) => (
-            <td key={field}>
+        {chemicalTableColumns.map(({ field, format, formatEditable, hideBelow }) => (
+            <td className={getCellClass(hideBelow)} key={field}>
                 {isEditing && formatEditable
                     ? formatEditable(chemical, (value) => handleFieldChanged(field, value))
                     : format
@@ -141,7 +154,7 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
                     </div>
                 ) : (
                     <div className="btn-group" role="group">
-                        <button className="btn btn-outline-primary" onClick={() => setEditing(true)}>Edit</button>
+                        <button className={`btn btn-outline-primary ${getCellClass("sm")}`} onClick={() => setEditing(true)}>Edit</button>
                         <button className="btn btn-outline-primary">Transfer</button>
                         <button className="btn btn-outline-primary" onClick={archive}>Archive</button>
                     </div>
