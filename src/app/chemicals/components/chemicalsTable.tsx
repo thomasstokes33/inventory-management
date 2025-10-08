@@ -4,6 +4,7 @@ import { MaterialType, Status } from "@prisma/client";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 type TableColumn<T, K extends keyof T = keyof T> = {
     field: K;
     label: string;
@@ -67,14 +68,18 @@ export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
         </div>
     );
 }
-
-enum UpdateStatusVals { SUCCESS, ERROR, IDLE }
+const checkResponse = async (response: Response) => {
+    if (response.ok) {
+        return response.json();
+    } else {
+        throw new Error(response.statusText);
+    }
+};
 type ChemicalRowProps = { initialChemical: ChemicalRecord, router : AppRouterInstance }
 export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
     const [isEditing, setEditing] = useState<boolean>(false);
     const [chemical, setChemical] = useState(initialChemical);
     const [draft, setDraft] = useState(initialChemical);
-    const [updateStatus, setUpdateStatus] = useState<UpdateStatusVals>(UpdateStatusVals.IDLE);
     const handleFieldChanged = <K extends keyof ChemicalRecord>(key: K, value: ChemicalRecord[K]) => {
         const newState = { ...draft, [key]: value };
         console.log(newState);
@@ -82,40 +87,38 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
     };
     const archive = async () => {
         const archivedChemical = { ...chemical, status: "ARCHIVED" };
-        await fetch(`/api/chemicals/${chemical.id}`, {
+        const fetchPromise = fetch(`/api/chemicals/${chemical.id}`, {
             method: "POST",
             body: JSON.stringify(archivedChemical)
-        });
-        router.refresh();
+        }).then(checkResponse);
+        toast.promise(fetchPromise,
+            {
+                loading: "Archiving",
+                success: "Archived",
+                error: "Unable to archive"
+            }
+        ).then(() => router.refresh()).catch(() => { });
+
     };
     const saveRow = async () => {
-        const res = await fetch(`/api/chemicals/${chemical.id}`,
+        const savePromise = fetch(`/api/chemicals/${chemical.id}`,
             {
                 method: "POST",
                 body: JSON.stringify(draft)
             }
-        );
-        if (res.ok) {
+        ).then(checkResponse);
+        toast.promise(savePromise,
+            {
+                loading: "Saving",
+                success: "Updated",
+                error: "Unable to update"
+            }
+        ).then(() => {
             setChemical(draft);
             setDraft(draft);
-            setUpdateStatus(UpdateStatusVals.SUCCESS);
-        } else {
-            setUpdateStatus(UpdateStatusVals.ERROR);
-        }
-        setTimeout(() => {
-            setUpdateStatus(UpdateStatusVals.IDLE);
-        }, 1000);
+            router.refresh();
+        }).catch(() => { });
         setEditing(false);
-        router.refresh();
-    };
-    const renderStatusIcon = () => {
-        return (
-            <span>{updateStatus === UpdateStatusVals.SUCCESS
-                ? "✅"
-                : updateStatus === UpdateStatusVals.ERROR
-                    ? "❌"
-                    : null}</span>
-        );
     };
     return (<tr>
         {chemicalTableColumns.map(({ field, format, formatEditable }) => (
@@ -144,7 +147,6 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
                     </div>
                 )
             }
-            {renderStatusIcon()}
         </td>
 
     </tr>);
