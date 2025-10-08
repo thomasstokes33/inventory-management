@@ -23,7 +23,6 @@ export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
                     <option key={status} value={status}>{status.toLowerCase()}</option>)}
             </select>);
         },
-        hideBelow: "sm"
     },
     {
         field: "hazardClass", label: "Hazard class",
@@ -36,7 +35,7 @@ export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
     },
     {
         field: "materialType", label: "Material Type", formatEditable: (chemical, onChangeHandler) => {
-            return (<select className="form-select" defaultValue={chemical.status} onChange={(e) => onChangeHandler(e.target.value)}>
+            return (<select className="form-select" defaultValue={chemical.materialType} onChange={(e) => onChangeHandler(e.target.value)}>
                 {Object.values(MaterialType).map((materialType) =>
                     <option key={materialType} value={materialType}>{materialType.toLowerCase()}</option>)}
             </select>);
