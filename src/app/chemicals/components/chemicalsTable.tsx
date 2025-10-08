@@ -44,12 +44,8 @@ export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
     },
 ];
 
-function getCellClass(hideBelow?: HideBelowOptions) {
-    if (!hideBelow) return "";
-    return `d-none d-${hideBelow}-table-cell`;
-}
 
-const checkResponse = async (response: Response) => {
+async function checkResponse(response: Response) {
     if (response.ok) {
         return response.json();
     } else {
