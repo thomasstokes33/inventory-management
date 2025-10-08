@@ -1,8 +1,9 @@
 "use client";
+import Table, { Row, RowAction } from "@/app/components/table";
+import useDebounce from "@/app/hooks/useDebounce";
 import { ChemicalRecord } from "@/schemas/chemical";
 import { MaterialType, Status } from "@prisma/client";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -56,41 +57,40 @@ async function checkResponse(response: Response) {
 type ChemicalsTableProps = { initialChems: ChemicalRecord[] }
 export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
     const [searchVal, setSearchVal] = useState<string>("");
-    const router = useRouter();
+    const debouncedVal = useDebounce<string>(searchVal, 1000);
+    const items = initialChems.filter((item) => {
+        return chemicalTableColumns.some(({ field }) => {
+            const filterOn = item[field];
+            let found = false;
+            const lowerCaseFilterVal = debouncedVal.toLowerCase();
+            if (!filterOn) {
+                found = false;
+            } else if (Array.isArray(filterOn)) {
+                found = filterOn.some((val) => val.classification.toLowerCase().includes(lowerCaseFilterVal));
+            } else {
+                found = String(filterOn).toLowerCase().includes(lowerCaseFilterVal);
+            }
+            return found;
+        });
+    });
     return (
         <div className="container-xxl">
             <div className="input-group">
-                <input className="form-control" placeholder="Search" onChange={(e) => setSearchVal(e.target.value)}/>
+                <input className="form-control" placeholder="Search" onChange={(e) => setSearchVal(e.target.value)} />
             </div>
-            <div className="table-responsive">
-                <table className="table">
-                    <thead className="table-dark">
-                        <tr>
-                            {chemicalTableColumns.map((col) => (
-                                <td key={col.field} className={getCellClass(col.hideBelow)}>{col.label}</td>
-                            ))}
-                            <td>Actions</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {initialChems.filter((chemical) => (chemical.name.toLowerCase().includes(searchVal))).map((chemical: ChemicalRecord) => (
-                            <ChemicalRow router={router} key={chemical.id} initialChemical={chemical} />
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            <Table RowComponent={ChemicalRow} tableColumns={chemicalTableColumns} items={items} />
         </div>
     );
 }
 
-type ChemicalRowProps = { initialChemical: ChemicalRecord, router : AppRouterInstance }
-export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
+
+type ChemicalRowProps = { item: ChemicalRecord, router: AppRouterInstance };
+export function ChemicalRow({ item, router }: ChemicalRowProps) {
     const [isEditing, setEditing] = useState<boolean>(false);
-    const [chemical, setChemical] = useState(initialChemical);
-    const [draft, setDraft] = useState(initialChemical);
-    const handleFieldChanged = <K extends keyof ChemicalRecord>(key: K, value: ChemicalRecord[K]) => {
+    const [chemical, setChemical] = useState(item);
+    const [draft, setDraft] = useState(item);
+    const handleFieldChanged = <K extends keyof ChemicalRecord>(key: K, value: string) => {
         const newState = { ...draft, [key]: value };
-        console.log(newState);
         setDraft(newState);
     };
     const archive = async () => {
@@ -108,6 +108,9 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
         ).then(() => router.refresh()).catch(() => { });
 
     };
+    const editAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Edit", actionHandler: () => { setEditing(true);}, hiddenClass: "sm" };
+    const transferAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Transfer" };
+    const archiveAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Archive", actionHandler: () => archive()};
     const saveRow = async () => {
         const savePromise = fetch(`/api/chemicals/${chemical.id}`,
             {
@@ -128,34 +131,8 @@ export function ChemicalRow({ initialChemical, router }: ChemicalRowProps) {
         }).catch(() => { });
         setEditing(false);
     };
-    return (<tr>
-        {chemicalTableColumns.map(({ field, format, formatEditable, hideBelow }) => (
-            <td className={getCellClass(hideBelow)} key={field}>
-                {isEditing && formatEditable
-                    ? formatEditable(chemical, (value) => handleFieldChanged(field, value))
-                    : format
-                        ? format(chemical)
-                        : chemical[field]?.toString()
-                }
-            </td>
-        ))
-        }
-        <td>
-            {
-                isEditing ? (
-                    <div className="btn-group" role="group">
-                        <button className="btn btn-outline-primary" onClick={saveRow}>Save</button>
-                        <button className="btn btn-outline-secondary" onClick={() => {setDraft(chemical); setEditing(false);}}>Cancel</button>
-                    </div>
-                ) : (
-                    <div className="btn-group" role="group">
-                        <button className={`btn btn-outline-primary ${getCellClass("sm")}`} onClick={() => setEditing(true)}>Edit</button>
-                        <button className="btn btn-outline-primary">Transfer</button>
-                        <button className="btn btn-outline-primary" onClick={archive}>Archive</button>
-                    </div>
-                )
-            }
-        </td>
-
-    </tr>);
+    const saveRowAction: RowAction = { isPrimary: true, showWhenEditing: true, showWhenNotEditing: false, label: "Save", actionHandler: saveRow };
+    const cancelSaveRowAction: RowAction = { isPrimary: false, showWhenEditing: true, showWhenNotEditing: false, label: "Cancel", actionHandler: () => { setDraft(item); setEditing(false); } };
+    const actions = [editAction, transferAction, archiveAction, saveRowAction, cancelSaveRowAction];
+    return (<Row actions={actions} item={chemical} tableColumns={chemicalTableColumns} isEditing={isEditing} onChange={handleFieldChanged} />);
 }
