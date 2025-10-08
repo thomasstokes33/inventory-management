@@ -13,11 +13,11 @@ export default async function ChemicalDashboard() {
     return (
         <div className="container-lg mt-5">
             <div className="row">
-                <div className="col-md-4">
+                <div className="col-lg-4">
                     {/* Each column is a feature */}
                     <CreateChemical hazardClasses={hazardClasses}/>
                 </div>
-                <div className="col-md-8">
+                <div className="col-lg-8">
                     <div className="card">
                         <div className="card-header">
                             Chemicals
