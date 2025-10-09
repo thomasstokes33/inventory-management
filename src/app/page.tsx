@@ -2,8 +2,8 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import { ChemicalRecord, chemicalSchema } from "@/schemas/chemical";
 import prisma from "@/lib/prisma";
-import CountCard from "./components/countCard";
-import StatsCard from "./components/statsCard";
+import CountCard from "./components/CountCard";
+import StatsCard from "./components/StatsCard";
 
 
 

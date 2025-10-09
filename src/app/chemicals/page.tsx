@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
-import ChemicalsTable from "./components/chemicalsTable";
-import CreateChemical from "./components/createChemical";
+import ChemicalsTable from "./components/ChemicalsTable";
+import CreateChemical from "./components/CreateChemical";
 import { ChemicalRecordWithTotalStock, chemicalSchemaWithTotalStock } from "@/schemas/chemical";
 
 export default async function ChemicalDashboard() {

@@ -1,5 +1,5 @@
 "use client";
-import Table, { Row, RowAction, TableColumn } from "@/app/components/table";
+import Table, { Row, RowAction, TableColumn } from "@/app/components/Table";
 import useDebounce from "@/app/hooks/useDebounce";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { ChemicalRecordWithTotalStock } from "@/schemas/chemical";
