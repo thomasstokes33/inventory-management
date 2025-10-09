@@ -17,6 +17,7 @@ export const chemicalTableColumns: TableColumn<ChemicalRowData>[] = [
                     <option key={status} value={status}>{status.toLowerCase()}</option>)}
             </select>);
         },
+        hideBelow: "sm"
     },
     {
         field: "hazardClass", label: "Hazard class",
@@ -24,7 +25,7 @@ export const chemicalTableColumns: TableColumn<ChemicalRowData>[] = [
         (c.hazardClass.length ?
             c.hazardClass.map(({ classification }) => (classification)).join(", ")
             : <em>No classification</em>),
-        hideBelow: "sm"
+        hideBelow: "md"
 
     },
     {
