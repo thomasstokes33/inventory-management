@@ -108,7 +108,7 @@ export function ChemicalRow({ item, router }: ChemicalRowProps) {
         ).then(() => router.refresh()).catch(() => { });
 
     };
-    const editAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Edit", actionHandler: () => { setEditing(true);}, hiddenClass: "sm" };
+    const editAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Edit", actionHandler: () => { setEditing(true); setDraft(chemical); }, hiddenClass: "sm" };
     const transferAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Transfer" };
     const archiveAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Archive", actionHandler: () => archive()};
     const saveRow = async () => {
