@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { ComponentType, MouseEventHandler } from "react";
 
 type HideBelowOptions = "sm" | "md" | "lg" | "xl"
-type TableColumn<T, K extends keyof T = keyof T> = {
+export type TableColumn<T, K extends keyof T = keyof T> = {
     field: K;
     label: string;
     format?: (value: T) => React.ReactNode;

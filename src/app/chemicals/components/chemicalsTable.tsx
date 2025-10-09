@@ -1,5 +1,5 @@
 "use client";
-import Table, { Row, RowAction } from "@/app/components/table";
+import Table, { Row, RowAction, TableColumn } from "@/app/components/table";
 import useDebounce from "@/app/hooks/useDebounce";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { ChemicalRecord } from "@/schemas/chemical";
@@ -7,14 +7,7 @@ import { MaterialType, Status } from "@prisma/client";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 
-type HideBelowOptions = "sm" | "md" | "lg" | "xl"
-type TableColumn<T, K extends keyof T = keyof T> = {
-    field: K;
-    label: string;
-    format?: (value: T) => React.ReactNode;
-    formatEditable?: (value: T, onChangeHandler: (value: string) => void) => React.ReactNode;
-    hideBelow?: HideBelowOptions;
-};
+
 export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
     { field: "name", label: "Name" },
     {
