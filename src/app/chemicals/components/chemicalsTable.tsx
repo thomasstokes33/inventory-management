@@ -132,7 +132,7 @@ export function ChemicalRow({ item, router }: ChemicalRowProps) {
         setEditing(false);
     };
     const saveRowAction: RowAction = { isPrimary: true, showWhenEditing: true, showWhenNotEditing: false, label: "Save", actionHandler: saveRow };
-    const cancelSaveRowAction: RowAction = { isPrimary: false, showWhenEditing: true, showWhenNotEditing: false, label: "Cancel", actionHandler: () => { setDraft(item); setEditing(false); } };
+    const cancelSaveRowAction: RowAction = { isPrimary: false, showWhenEditing: true, showWhenNotEditing: false, label: "Cancel", actionHandler: () => { setDraft(chemical); setEditing(false); } };
     const actions = [editAction, transferAction, archiveAction, saveRowAction, cancelSaveRowAction];
     return (<Row actions={actions} item={chemical} tableColumns={chemicalTableColumns} isEditing={isEditing} onChange={handleFieldChanged} />);
 }
