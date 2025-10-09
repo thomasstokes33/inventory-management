@@ -26,7 +26,7 @@ export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
             method: "PUT",
             body: formData
         });
-        const data = await res.json();
+        await res.json();
         if (res.ok) {
             setSuccess(true);
             setMessage("Successfully added chemical");
