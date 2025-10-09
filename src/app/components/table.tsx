@@ -3,11 +3,11 @@ import { useRouter } from "next/navigation";
 import { ComponentType, MouseEventHandler } from "react";
 
 type HideBelowOptions = "sm" | "md" | "lg" | "xl"
-type TableColumn<T, K = keyof T> = {
+type TableColumn<T, K extends keyof T = keyof T> = {
     field: K;
     label: string;
     format?: (value: T) => React.ReactNode;
-    formatEditable?: (value: T, onChangeHandler: (value: string) => void) => React.ReactNode;
+    formatEditable?: (value: T, onChangeHandler: (value: T[K]) => void) => React.ReactNode;
     hideBelow?: HideBelowOptions;
 };
 
@@ -44,7 +44,7 @@ export default function Table<T extends {id: number}>({ tableColumns, items, Row
 }
 
 export type RowAction = { showWhenEditing: boolean, showWhenNotEditing: boolean, label: string, isPrimary: boolean, actionHandler?: MouseEventHandler<HTMLButtonElement>, hiddenClass?: HideBelowOptions }
-type RowProps<T, K extends keyof T = keyof T> = { item: T, isEditing: boolean, tableColumns: TableColumn<T>[], onChange: (field: K, value: string) => void, actions: RowAction[] }
+type RowProps<T, K extends keyof T = keyof T> = { item: T, isEditing: boolean, tableColumns: TableColumn<T>[], onChange: (field: K, value: T[K]) => void, actions: RowAction[] }
 export function Row<T>({ item, tableColumns, isEditing, onChange, actions }: RowProps<T>) {
 
     return (<tr>
