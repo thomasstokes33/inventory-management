@@ -69,7 +69,7 @@ export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
             const filterOn = item[field];
             let found = false;
             const lowerCaseFilterVal = debouncedVal.toLowerCase();
-            if (!filterOn) {
+            if (filterOn == null) {  // Includes null and undefined.
                 found = false;
             } else if (Array.isArray(filterOn)) {
                 found = filterOn.some((val) => val.classification.toLowerCase().includes(lowerCaseFilterVal));
