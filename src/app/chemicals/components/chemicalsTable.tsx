@@ -2,12 +2,12 @@
 import Table, { Row, RowAction, TableColumn } from "@/app/components/table";
 import useDebounce from "@/app/hooks/useDebounce";
 import { toastifyFetch } from "@/lib/toastHelper";
-import { ChemicalRecord } from "@/schemas/chemical";
+import { ChemicalRecordWithTotalStock } from "@/schemas/chemical";
 import { MaterialType, Status } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type ChemicalRowData = ChemicalRecord;
+type ChemicalRowData = ChemicalRecordWithTotalStock;
 export const chemicalTableColumns: TableColumn<ChemicalRowData>[] = [
     { field: "name", label: "Name" },
     {
@@ -36,6 +36,27 @@ export const chemicalTableColumns: TableColumn<ChemicalRowData>[] = [
         },
         hideBelow: "sm"
     },
+    {
+        field: "totalQuantity", label: "Quantity", format: (c) => {
+            let unit: string;
+            const defaultUnit = "units";
+            switch (c.quantityType) {
+                case "MASS":
+                    unit = "g";
+                    break;
+                case "VOLUME":
+                    unit = "ml";
+                    break;
+                case "COUNT":
+                    unit = c.unit ?? defaultUnit;
+                    break;
+                default:
+                    unit = defaultUnit;
+                    break;
+            }
+            return `${c.totalQuantity} ${unit}`;
+        }
+    }
 ];
 
 type ChemicalsTableProps = { initialChems: ChemicalRowData[] }
