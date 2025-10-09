@@ -4,7 +4,7 @@ import useDebounce from "@/app/hooks/useDebounce";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { ChemicalRecord } from "@/schemas/chemical";
 import { MaterialType, Status } from "@prisma/client";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type ChemicalRowData = ChemicalRecord;
@@ -67,11 +67,12 @@ export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
     );
 }
 
-type ChemicalRowProps = { item: ChemicalRowData, router: AppRouterInstance};
-export function ChemicalRow({ item, router }: ChemicalRowProps) {
+type ChemicalRowProps = { item: ChemicalRowData};
+export function ChemicalRow({ item }: ChemicalRowProps) {
     const [isEditing, setEditing] = useState<boolean>(false);
     const [chemical, setChemical] = useState(item);
     const [draft, setDraft] = useState(item);
+    const router = useRouter();  // Not problematic as it returns the same object for each component until the page rerenders.
     const handleFieldChanged = <K extends keyof (typeof item)>(key: K, value: (typeof item)[K]) => {
         const newState = { ...draft, [key]: value };
         setDraft(newState);

@@ -1,5 +1,3 @@
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useRouter } from "next/navigation";
 import { ComponentType, MouseEventHandler } from "react";
 
 type HideBelowOptions = "sm" | "md" | "lg" | "xl"
@@ -11,16 +9,13 @@ export type TableColumn<T, K extends keyof T = keyof T> = {
     hideBelow?: HideBelowOptions;
 };
 
-
 function getCellClass(hideBelow?: HideBelowOptions) {
     if (!hideBelow) return "";
     return `d-none d-${hideBelow}-table-cell`;
 }
 
-
-type TableProps<I> = { tableColumns: TableColumn<I>[], items: I[], RowComponent: ComponentType<{ item: I, router: AppRouterInstance }> }
+type TableProps<I> = { tableColumns: TableColumn<I>[], items: I[], RowComponent: ComponentType<{ item: I}> }
 export default function Table<T extends {id: number}>({ tableColumns, items, RowComponent }: TableProps<T>) {
-    const router = useRouter();
     return (
         <div className="table-responsive">
             <table className="table">
@@ -34,7 +29,7 @@ export default function Table<T extends {id: number}>({ tableColumns, items, Row
                 </thead>
                 <tbody>
                     {items.map((item: T) => {
-                        return <RowComponent key={item.id} router={router}  item={item} />;
+                        return <RowComponent key={item.id}  item={item} />;
                     
                     })}
                 </tbody>
@@ -46,7 +41,6 @@ export default function Table<T extends {id: number}>({ tableColumns, items, Row
 export type RowAction = { showWhenEditing: boolean, showWhenNotEditing: boolean, label: string, isPrimary: boolean, actionHandler?: MouseEventHandler<HTMLButtonElement>, hiddenClass?: HideBelowOptions }
 type RowProps<T, K extends keyof T = keyof T> = { item: T, isEditing: boolean, tableColumns: TableColumn<T>[], onChange: (field: K, value: T[K]) => void, actions: RowAction[] }
 export function Row<T>({ item, tableColumns, isEditing, onChange, actions }: RowProps<T>) {
-
     return (<tr>
         {tableColumns.map(({ field, format, formatEditable, hideBelow }, index) => (
             <td className={getCellClass(hideBelow)} key={index}>
@@ -69,6 +63,5 @@ export function Row<T>({ item, tableColumns, isEditing, onChange, actions }: Row
                 return <button onClick={action.actionHandler} className={`btn ${btnClass}`} key={index}>{action.label}</button>;
             })}
         </td>
-
     </tr>);
 }
