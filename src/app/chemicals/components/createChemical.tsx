@@ -1,5 +1,5 @@
 "use client";
-
+import "bootstrap-icons/font/bootstrap-icons.min.css";
 import { HazardClass, MaterialType, QuantityType, Status } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -65,7 +65,7 @@ export default function CreateChemical({hazardClasses} : CreateChemicalProps) {
                         ))}
                     </select>
                     <div>
-                        <label>Count unit (only used if Quantity type is &quot;count&quot;)</label>
+                        <div><i className="bi bi-info-square" ></i></div>
                         <input name="unit" type="string" className="form-control" required={false} />
                     </div>
                     <div className="mt-2">
