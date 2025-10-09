@@ -11,7 +11,8 @@ export const chemicalSchema = z.object({
     materialType: z.enum(MaterialType),
     unit: z.string().nullable(),
     createdAt: z.date(),
-    updatedAt: z.date()
-});
+    updatedAt: z.date()});
 
+export const chemicalSchemaWithTotalStock = chemicalSchema.extend({totalQuantity: z.number().nonnegative()});
+export type ChemicalRecordWithTotalStock = z.infer<typeof chemicalSchemaWithTotalStock>;
 export type ChemicalRecord = z.infer<typeof chemicalSchema>;
