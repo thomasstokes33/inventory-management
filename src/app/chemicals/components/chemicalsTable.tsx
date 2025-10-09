@@ -7,8 +7,8 @@ import { MaterialType, Status } from "@prisma/client";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 
-
-export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
+type ChemicalRowData = ChemicalRecord;
+export const chemicalTableColumns: TableColumn<ChemicalRowData>[] = [
     { field: "name", label: "Name" },
     {
         field: "status", label: "Status", formatEditable: (chemical, onChangeHandler) => {
@@ -20,7 +20,7 @@ export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
     },
     {
         field: "hazardClass", label: "Hazard class",
-        format: (c: ChemicalRecord) =>
+        format: (c) =>
         (c.hazardClass.length ?
             c.hazardClass.map(({ classification }) => (classification)).join(", ")
             : <em>No classification</em>),
@@ -38,10 +38,7 @@ export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
     },
 ];
 
-
-
-
-type ChemicalsTableProps = { initialChems: ChemicalRecord[] }
+type ChemicalsTableProps = { initialChems: ChemicalRowData[] }
 export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
     const [searchVal, setSearchVal] = useState<string>("");
     const debouncedVal = useDebounce<string>(searchVal, 1000);
@@ -70,13 +67,12 @@ export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
     );
 }
 
-
-type ChemicalRowProps = { item: ChemicalRecord, router: AppRouterInstance };
+type ChemicalRowProps = { item: ChemicalRowData, router: AppRouterInstance};
 export function ChemicalRow({ item, router }: ChemicalRowProps) {
     const [isEditing, setEditing] = useState<boolean>(false);
     const [chemical, setChemical] = useState(item);
     const [draft, setDraft] = useState(item);
-    const handleFieldChanged = <K extends keyof ChemicalRecord>(key: K, value: ChemicalRecord[K]) => {
+    const handleFieldChanged = <K extends keyof (typeof item)>(key: K, value: (typeof item)[K]) => {
         const newState = { ...draft, [key]: value };
         setDraft(newState);
     };
