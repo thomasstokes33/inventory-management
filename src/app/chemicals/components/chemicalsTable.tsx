@@ -1,11 +1,11 @@
 "use client";
 import Table, { Row, RowAction } from "@/app/components/table";
 import useDebounce from "@/app/hooks/useDebounce";
+import { toastifyFetch } from "@/lib/toastHelper";
 import { ChemicalRecord } from "@/schemas/chemical";
 import { MaterialType, Status } from "@prisma/client";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
-import toast from "react-hot-toast";
 
 type HideBelowOptions = "sm" | "md" | "lg" | "xl"
 type TableColumn<T, K extends keyof T = keyof T> = {
@@ -46,13 +46,7 @@ export const chemicalTableColumns: TableColumn<ChemicalRecord>[] = [
 ];
 
 
-async function checkResponse(response: Response) {
-    if (response.ok) {
-        return response.json();
-    } else {
-        throw new Error(response.statusText);
-    }
-};
+
 
 type ChemicalsTableProps = { initialChems: ChemicalRecord[] }
 export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
@@ -89,46 +83,41 @@ export function ChemicalRow({ item, router }: ChemicalRowProps) {
     const [isEditing, setEditing] = useState<boolean>(false);
     const [chemical, setChemical] = useState(item);
     const [draft, setDraft] = useState(item);
-    const handleFieldChanged = <K extends keyof ChemicalRecord>(key: K, value: string) => {
+    const handleFieldChanged = <K extends keyof ChemicalRecord>(key: K, value: ChemicalRecord[K]) => {
         const newState = { ...draft, [key]: value };
         setDraft(newState);
     };
     const archive = async () => {
         const archivedChemical = { ...chemical, status: "ARCHIVED" };
-        const fetchPromise = fetch(`/api/chemicals/${chemical.id}`, {
+        toastifyFetch(`/api/chemicals/${chemical.id}`, {
             method: "POST",
             body: JSON.stringify(archivedChemical)
-        }).then(checkResponse);
-        toast.promise(fetchPromise,
-            {
-                loading: "Archiving",
-                success: "Archived",
-                error: "Unable to archive"
-            }
-        ).then(() => router.refresh()).catch(() => { });
-
+        }, {
+            loading: "Archiving",
+            success: "Archived",
+            error: "Unable to archive"
+        }, () => router.refresh(), () => {});
     };
     const editAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Edit", actionHandler: () => { setEditing(true); setDraft(chemical); }, hiddenClass: "sm" };
     const transferAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Transfer" };
     const archiveAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Archive", actionHandler: () => archive()};
     const saveRow = async () => {
-        const savePromise = fetch(`/api/chemicals/${chemical.id}`,
-            {
-                method: "POST",
-                body: JSON.stringify(draft)
-            }
-        ).then(checkResponse);
-        toast.promise(savePromise,
+        toastifyFetch(`/api/chemicals/${chemical.id}`, {
+            method: "POST",
+            body: JSON.stringify(draft)
+        },
             {
                 loading: "Saving",
                 success: "Updated",
                 error: "Unable to update"
-            }
-        ).then(() => {
-            setChemical(draft);
-            setDraft(draft);
-            router.refresh();
-        }).catch(() => { });
+            },
+            () => {
+                setChemical(draft);
+                setDraft(draft);
+                router.refresh();
+            }, () => {
+                setDraft(chemical);
+            });
         setEditing(false);
     };
     const saveRowAction: RowAction = { isPrimary: true, showWhenEditing: true, showWhenNotEditing: false, label: "Save", actionHandler: saveRow };
