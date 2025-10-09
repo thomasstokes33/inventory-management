@@ -2,13 +2,17 @@
 import "bootstrap-icons/font/bootstrap-icons.min.css";
 import { HazardClass, MaterialType, QuantityType, Status } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
-
-
-
-
-type CreateChemicalProps = {hazardClasses : HazardClass[]}
-export default function CreateChemical({hazardClasses} : CreateChemicalProps) {
+import { FormEvent, useEffect, useState } from "react";
+type CreateChemicalProps = { hazardClasses: HazardClass[] }
+export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
+    useEffect(() => {
+        import("bootstrap").then(({Tooltip}) => {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"tooltip\"]"));
+            tooltipTriggerList.map((tooltipTriggerEl) => {
+                return new Tooltip(tooltipTriggerEl);
+            });
+        });
+    }, []); // useEffect runs after DOM creation.
     const router = useRouter();
     const [message, setMessage] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean| null>(null);
@@ -65,7 +69,8 @@ export default function CreateChemical({hazardClasses} : CreateChemicalProps) {
                         ))}
                     </select>
                     <div>
-                        <div><i className="bi bi-info-square" ></i></div>
+                        <label>Count unit (add plural form in brackets)</label>
+                        <div><i className="bi bi-info-square" data-bs-toggle="tooltip" data-bs-placement="right" title="(only used if Quantity type is &quot;count&quot;)"></i></div>
                         <input name="unit" type="string" className="form-control" required={false} />
                     </div>
                     <div className="mt-2">
