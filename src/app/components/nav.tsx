@@ -12,7 +12,7 @@ export default function Nav() {
                 <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div className="navbar-nav">
                         <Link className="nav-link" href="/chemicals">Chemicals</Link>
-                        <Link className="nav-link" href="/issue-receipt">Goods Receipt/Item</Link>
+                        <Link className="nav-link" href="/stock-management">Stock Management</Link>
                         <Link className="nav-link" href="/query">Query</Link>
                     </div>
                 </div>
