@@ -3,24 +3,28 @@
 This is the beginnings of a web-based Inventory Management System built with modern web technologies. The project is intended to provide a simple interface to manage chemicals and other inventory items, with full database interaction and type-safe validation.
 
 ## Features (so far)
-- Basic frontend table displaying inventory items
-- Inline updates to database records
+- Dashboard with cards for record counts and listing
+- Chemical page, which allows creation and inline editing of certain chemical features
 - Type validation using Zod
 - Database management and queries via Prisma
+- Generic table component
+- Debounce hook
 
 ## Stack
 Next.js & React – frontend framework and UI components
 Prisma – database ORM for TypeScript
 Zod – runtime type validation and schema enforcement
 SQLite – supported database (adjust in Prisma config)
+React Hot Toast - for some status notifications, with promise capabilities
+Bootstrap 5 - for styling and the odd component such as tooltips (in the future react-bootstrap may be worth exploring)
+Bootstrap icons - for scalable consistent icons
 
-
-## Getting Started
+# Getting Started
 
 ## Prerequisites
 - Node.js (v22 used)
 - npm
-- SQLite installed
+- SQLite
 
 ## Installation
 ```
