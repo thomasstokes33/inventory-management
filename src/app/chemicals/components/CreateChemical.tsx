@@ -44,34 +44,34 @@ export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
             </div>
             <div className="card-body">
                 <form method="PUT" onSubmit={handleCreateSubmit}>
-                    <label>Name</label>
-                    <input name="name" type="text" className="form-control" required />
-                    <label>Status</label>
-                    <select name="status" className="form-select">
+                    <label htmlFor="create-name">Name</label>
+                    <input id="create-name" name="name" type="text" className="form-control" required />
+                    <label htmlFor="create-status">Status</label>
+                    <select id="create-status" name="status" className="form-select">
                         {Object.values(Status).map((value) => (
                             <option key={value} value={value}>{value.toLowerCase()}</option>
                         ))}
                     </select>
-                    <label>Hazard classes</label>
-                    <select  name="hazardClass" className="form-select" multiple> 
+                    <label htmlFor="create-hazard-class">Hazard classes</label>
+                    <select id="create-hazard-class"  name="hazardClass" className="form-select" multiple> 
                         {hazardClasses.map((hazardClass, key) => (<option key={key} value={hazardClass.id}>{hazardClass.classification}</option>))}
                     </select>
-                    <label>Material</label>
-                    <select name="materialType" className="form-select">
+                    <label htmlFor="create-material-type">Material</label>
+                    <select id="create-material-type" name="materialType" className="form-select">
                         {Object.values(MaterialType).map((value) => (
                             <option key={value} value={value}>{value.toLowerCase()}</option>
                         ))}
                     </select>
-                    <label>Quantity type</label>
-                    <select name="quantityType" className="form-select" >
+                    <label htmlFor="create-quantity-type">Quantity type</label>
+                    <select id="create-quantity-type" name="quantityType" className="form-select" >
                         {Object.values(QuantityType).map((value) => (
                             <option key={value} value={value}>{value.toLowerCase()}</option>
                         ))}
                     </select>
                     <div>
-                        <label>Count unit (add plural form in brackets)</label>
+                        <label htmlFor="create-count">Count unit (add plural form in brackets)</label>
                         <div><i className="bi bi-info-square" data-bs-toggle="tooltip" data-bs-placement="right" title="(only used if Quantity type is &quot;count&quot;)"></i></div>
-                        <input name="unit" type="string" className="form-control" required={false} />
+                        <input id="create-count" name="unit" type="string" className="form-control" required={false} />
                     </div>
                     <div className="mt-2">
                         <button type="submit" className="btn btn-primary me-2">Add Chemical</button>
