@@ -43,9 +43,10 @@ enum MovementType {
 
 
 enum CostType {
-    PURCHSAE
+    PURCHASE
     SELL
     TRANSFER
+    NONE // For discarding or using.
 }
 model Location {
     id Int @id @default(autoincrement())
@@ -93,6 +94,7 @@ model Stock {
     stockMovement StockMovement[]
     @@index([locationId])
     @@index([chemicalId])
+    @@unique([chemicalId, locationId])
 }
 
 model StockMovement {
