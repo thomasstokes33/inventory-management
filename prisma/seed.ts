@@ -53,6 +53,7 @@ export async function main() {
         });
     }
     await prisma.location.create({data: {address: "221B Baker Street", code: "4224"}});
+    await prisma.location.create({data: {address: "42 Wallaby Way", code: "5780"}});
 }
 
 main();
