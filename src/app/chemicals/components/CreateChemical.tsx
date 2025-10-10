@@ -40,7 +40,7 @@ export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
     return (
         <div className="card">
             <div className="card-header">
-                Add new Chemical
+                Add new chemical
             </div>
             <div className="card-body">
                 <form method="PUT" onSubmit={handleCreateSubmit}>
@@ -62,7 +62,7 @@ export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
                             <option key={value} value={value}>{value.toLowerCase()}</option>
                         ))}
                     </select>
-                    <label>Quantity Type</label>
+                    <label>Quantity type</label>
                     <select name="quantityType" className="form-select" >
                         {Object.values(QuantityType).map((value) => (
                             <option key={value} value={value}>{value.toLowerCase()}</option>
