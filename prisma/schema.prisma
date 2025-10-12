@@ -92,6 +92,7 @@ model Stock {
     location Location @relation(fields: [locationId], references: [id])
     stockQuantity Float // Float chosen to allow fractional quantities. Only use one unit for different states of material (ie. g for solid, ml for liquids. these can be converted client side to more readable units.)
     stockMovement StockMovement[]
+    archived Boolean @default(false) // Indicates a stock is no longer valid.
     @@index([locationId])
     @@index([chemicalId])
     @@unique([chemicalId, locationId])
