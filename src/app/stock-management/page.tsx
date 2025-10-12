@@ -1,26 +1,21 @@
-"use client";
 
-export default function IssueReceipt({ }) {
+import prisma from "@/lib/prisma";
+import StockCreationDeletion from "./components/StockCreationDeletion";
+import { LocationRecord, locationSchema } from "@/schemas/location";
+
+export  default async function IssueReceipt({ }) {
     const handleGoodsIssueReceipt = async () => {
     };
+    const rawLocations = await prisma.location.findMany();
+    const locations : LocationRecord[] = rawLocations.map((loc) => locationSchema.parse(loc));
     return (<div className="container-lg mt-5">
         <div className="row">
             <div className="col-md-6">
-                <div className="card">
-                    <div className="card-header">Setup location</div>
-                    <div className="card-body">
-                        <form>
-                            <label>chemical</label>
-                            <input className="form-control"></input>
-                            <label>location</label>
-                            <input className="form-control"></input>
-                        </form>
-                    </div>
-                </div>
+              <StockCreationDeletion locations={locations}/>
             </div>
             <div className="col-md-6">
                 <div className="card">
-                    <div className="card-header">Goods Issue/Receipt</div>
+                    <div className="card-header">Goods issue/receipt</div>
                     <div className="card-body">
                         <form>
                             <label>stock</label>
@@ -31,7 +26,6 @@ export default function IssueReceipt({ }) {
                             <input className="form-control"></input>
                             <label>amount</label>
                             <input className="form-control"></input>
-                            
                         </form>
                     </div>
                 </div>
