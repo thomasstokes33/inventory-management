@@ -1,12 +1,50 @@
 import prisma from "@/lib/prisma";
 import { chemicalSchema } from "@/schemas/chemical";
-import { NextResponse } from "next/server";
+import { Status } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
+const MAX_QUERY_LENGTH = 15;
+const MAX_CHEMICALS_RETURNED = 30;
+export type MinimalChemical = {
+    name: string;
+    id: number;
+};
 
-export async function GET() {
-    const chemicals = await prisma.chemical.findMany();
-    return NextResponse.json({ data: chemicals }, { status: 200 });
+
+async function getInitialChemicalsResponse() {
+    const chemicals = await prisma.chemical.findMany({ where: { status: { not: "ARCHIVED" } }, take: MAX_CHEMICALS_RETURNED });
+    return NextResponse.json({ chemicals: chemicals }, { status: 200 });
 }
+
+export async function GET(request: NextRequest) {
+    const searchParams: URLSearchParams = request.nextUrl.searchParams;
+    console.log(searchParams);
+    if (searchParams.size == 0) {
+        return getInitialChemicalsResponse();
+    } else {
+        const query = searchParams.get("query");
+        if (typeof query !== "string" || query.length > MAX_QUERY_LENGTH) {
+            return NextResponse.json({ error: "invalid query" }, { status: 400 });
+        }
+        if (query.trim().length === 0) {
+            return getInitialChemicalsResponse();
+        }
+        const trimmedSearch = query.trim();
+        const chemicals = await prisma.chemical.findMany({
+            take: MAX_CHEMICALS_RETURNED,
+            select: { id: true, name: true },
+            where: {
+                status: { not: "ARCHIVED" },
+                OR: [{ name: { contains: trimmedSearch.toLowerCase() } },
+                { status: { in: Object.values(Status).filter(status => status.toLowerCase().includes(trimmedSearch)) } }
+                ]
+            }
+        });
+        return NextResponse.json({ chemicals: chemicals }, { status: 200 });
+    }
+}
+
+
 type FormError = string;
 const chemicalCreationSchema = chemicalSchema.pick({ name: true, quantityType: true, status: true, materialType: true, unit: true }).partial({ unit: true });
 type ChemicalCreation = z.infer<typeof chemicalCreationSchema>;
@@ -27,7 +65,7 @@ export async function PUT(request: Request) {
         return NextResponse.json({ errors }, { status: 400 });
     }
     const chemical = await prisma.chemical.create({ data: { ...parsedChemical, hazardClass: { connect: formHazardClasses } } });
-    return NextResponse.json({ success: chemical }, { status: 200 });
+    return NextResponse.json({ chemical: chemical }, { status: 200 });
 }
 
 function validateChemical(newChemical: Record<string, string | string[]>): { valid: ChemicalCreation | null, errors: FormError[] } {
