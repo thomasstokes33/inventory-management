@@ -4,7 +4,7 @@ import { hazardSchema } from "./hazardClass";
 
 export const chemicalSchema = z.object({
     id: z.number().nonnegative(),
-    name: z.string(),
+    name: z.string().toLowerCase(),
     status: z.enum(Status),
     hazardClass: z.array(hazardSchema),
     quantityType: z.enum(QuantityType),
