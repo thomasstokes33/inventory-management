@@ -43,7 +43,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const updatedChemical = await prisma.chemical.update({
         where: {
             id: chemId
-        }, data: { status: parsedChem.status, materialType: parsedChem.materialType }
+        }, data: { status: parsedChem.status, materialType: parsedChem.materialType } // Currently only these fields can be updated.
     });
     return generateResponse({ chemical: updatedChemical }, 200);
 }
