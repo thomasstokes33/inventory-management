@@ -1,6 +1,6 @@
 
 import prisma from "@/lib/prisma";
-import StockCreationDeletion from "./components/StockCreationDeletion";
+import StockCreation from "./components/StockCreation";
 import { LocationRecord, locationSchema } from "@/schemas/location";
 
 export  default async function IssueReceipt({ }) {
@@ -11,7 +11,7 @@ export  default async function IssueReceipt({ }) {
     return (<div className="container-lg mt-5">
         <div className="row">
             <div className="col-md-6">
-              <StockCreationDeletion locations={locations}/>
+              <StockCreation locations={locations}/>
             </div>
             <div className="col-md-6">
                 <div className="card">

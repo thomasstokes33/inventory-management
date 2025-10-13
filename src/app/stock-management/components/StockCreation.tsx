@@ -14,7 +14,7 @@ type SelectOption = {
     value: number
     label: string
 }
-export default function StockCreationDeletion({ locations }: StockCreationDeletionProps) {
+export default function StockCreation({ locations }: StockCreationDeletionProps) {
     const locationOptions: Options<SelectOption> = locations.map((loc) => ({
         value: loc.id, label: formatLocation(loc)
     }));
