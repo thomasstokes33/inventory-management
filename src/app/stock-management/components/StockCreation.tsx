@@ -5,6 +5,7 @@ import { API_ROUTES } from "@/lib/apiRoutes";
 import formatLocation from "@/lib/locationFormatter";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { LocationRecord } from "@/schemas/location";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Options } from "react-select";
 import Select from "react-select";
@@ -34,16 +35,20 @@ export default function StockCreation({ locations }: StockCreationDeletionProps)
         setSelectedLocation(null);
         setSelectedChemical(null);
     };
+    const router = useRouter();
     const submitForm = async (e: FormEvent) => {
         e.preventDefault();
         toastifyFetch(API_ROUTES.STOCKS, {
             method: "PUT",
             body: JSON.stringify({ locationId: selectedLocation?.value, chemicalId: selectedChemical?.value })
-        },{
+        }, {
             loading: "Defining new stock",
             success: "Stock combination created",
             error: "Combination not created" // non unique or non existent.
-        }, resetForm, () => {});
+        }, () => {
+            router.refresh();
+            resetForm();
+        }, () => { });
     };
     return (<div className="card">
         <div className="card-header">Setup location</div>
