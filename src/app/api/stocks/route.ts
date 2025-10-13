@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { stockSchema } from "@/schemas/stock";
+import { stockCreationSchema } from "@/schemas/stock";
 import { Stock } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/binary";
 import { NextResponse } from "next/server";
@@ -9,7 +9,6 @@ export async function GET() {
     return NextResponse.json({ data: stocks }, { status: 200 });
 }
 
-const stockCreationSchema = stockSchema.pick({ locationId: true, chemicalId: true });
 export async function PUT(request: Request) {
     let data;
     try {
