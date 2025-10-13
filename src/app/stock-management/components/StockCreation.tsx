@@ -55,7 +55,7 @@ export default function StockCreation({ locations }: StockCreationDeletionProps)
         <div className="card-body">
             <form method="PUT" onSubmit={submitForm}>
                 <label className="form-label" htmlFor="stock-creation-chemical">Chemical</label>
-                <AsyncSelect defaultOptions instanceId="chem" required onChange={setSelectedChemical} loadOptions={fetchChemicalOptions} cacheOptions value={selectedChemical} />
+                <AsyncSelect defaultOptions  id="stock-creation-chemical" instanceId="chem" required onChange={setSelectedChemical} loadOptions={fetchChemicalOptions} cacheOptions value={selectedChemical} />
                 <div className="mb-2">
                     <label htmlFor="stock-creation-location" className="form-label">Location</label>
                     <Select instanceId="loc" required id="stock-creation-location" options={locationOptions} onChange={setSelectedLocation} value={selectedLocation}/>
