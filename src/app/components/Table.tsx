@@ -39,12 +39,12 @@ export default function Table<T extends {id: number}>({ tableColumns, items, Row
 }
 
 export type RowAction = { showWhenEditing: boolean, showWhenNotEditing: boolean, label: string, isPrimary: boolean, actionHandler: MouseEventHandler<HTMLButtonElement>, hiddenClass?: HideBelowOptions }
-type RowProps<T, K extends keyof T = keyof T> = { item: T, isEditing: boolean, tableColumns: TableColumn<T>[], onChange: (field: K, value: T[K]) => void, actions: RowAction[] }
+type RowProps<T, K extends keyof T = keyof T> = { item: T, isEditing?: boolean, tableColumns: TableColumn<T>[], onChange?: (field: K, value: T[K]) => void, actions: RowAction[] }
 export function Row<T>({ item, tableColumns, isEditing, onChange, actions }: RowProps<T>) {
     return (<tr>
         {tableColumns.map(({ field, format, formatEditable, hideBelow }, index) => (
             <td className={getCellClass(hideBelow)} key={index}>
-                {isEditing && formatEditable
+                {isEditing && formatEditable && onChange
                     ? formatEditable(item, (value) => onChange(field, value))
                     : format
                         ? format(item)
