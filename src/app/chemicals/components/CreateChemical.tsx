@@ -3,6 +3,7 @@ import "bootstrap-icons/font/bootstrap-icons.min.css";
 import { HazardClass, MaterialType, QuantityType, Status } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import { API_ROUTES } from "@/lib/apiRoutes";
 type CreateChemicalProps = { hazardClasses: HazardClass[] }
 export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
     useEffect(() => {
@@ -22,7 +23,7 @@ export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
         setSuccess(null);
         const form = e.currentTarget;
         const formData = new FormData(form);
-        const res = await fetch("/api/chemicals", {
+        const res = await fetch(API_ROUTES.CHEMICALS, {
             method: "PUT",
             body: formData
         });

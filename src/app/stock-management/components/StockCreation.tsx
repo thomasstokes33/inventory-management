@@ -1,6 +1,7 @@
 "use client";
 
 import { MinimalChemical } from "@/app/api/chemicals/route";
+import { API_ROUTES } from "@/lib/apiRoutes";
 import formatLocation from "@/lib/locationFormatter";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { LocationRecord } from "@/schemas/location";
@@ -21,7 +22,7 @@ export default function StockCreation({ locations }: StockCreationDeletionProps)
     const [selectedLocation, setSelectedLocation] = useState<SelectOption | null>(null);
     const [selectedChemical, setSelectedChemical] = useState<SelectOption | null>(null);
     const fetchChemicalOptions: (inputChemical: string) => Promise<SelectOption[]> = async (inputChemical: string) => {
-        const res = await fetch(`/api/chemicals?query=${encodeURIComponent(inputChemical)}`);
+        const res = await fetch(`${API_ROUTES.CHEMICALS}?query=${encodeURIComponent(inputChemical)}`);
         if (!res.ok) return [];
         else {
             const data = await res.json();
@@ -35,7 +36,7 @@ export default function StockCreation({ locations }: StockCreationDeletionProps)
     };
     const submitForm = async (e: FormEvent) => {
         e.preventDefault();
-        toastifyFetch("/api/stocks", {
+        toastifyFetch(API_ROUTES.STOCKS, {
             method: "PUT",
             body: JSON.stringify({ locationId: selectedLocation?.value, chemicalId: selectedChemical?.value })
         },{

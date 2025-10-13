@@ -1,6 +1,7 @@
 "use client";
 import Table, { Row, RowAction, TableColumn } from "@/app/components/Table";
 import useDebounce from "@/app/hooks/useDebounce";
+import { API_ROUTES } from "@/lib/apiRoutes";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { ChemicalRecordWithTotalStock } from "@/schemas/chemical";
 import { MaterialType, Status } from "@prisma/client";
@@ -101,7 +102,7 @@ export function ChemicalRow({ item }: ChemicalRowProps) {
     };
     const archive = async () => {
         const archivedChemical = { ...chemical, status: "ARCHIVED" };
-        toastifyFetch(`/api/chemicals/${chemical.id}`, {
+        toastifyFetch(`${API_ROUTES.CHEMICALS}/${chemical.id}`, {
             method: "POST",
             body: JSON.stringify(archivedChemical)
         }, {
@@ -114,7 +115,7 @@ export function ChemicalRow({ item }: ChemicalRowProps) {
     const transferAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Transfer", actionHandler: () => router.push("/stock-management") };
     const archiveAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Archive", actionHandler: () => archive()};
     const saveRow = async () => {
-        toastifyFetch(`/api/chemicals/${chemical.id}`, {
+        toastifyFetch(`${API_ROUTES.CHEMICALS}/${chemical.id}`, {
             method: "POST",
             body: JSON.stringify(draft)
         },
