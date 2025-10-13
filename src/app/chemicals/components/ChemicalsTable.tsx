@@ -111,7 +111,7 @@ export function ChemicalRow({ item }: ChemicalRowProps) {
         }, () => router.refresh(), () => {});
     };
     const editAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Edit", actionHandler: () => { setEditing(true); setDraft(chemical); }, hiddenClass: "sm" };
-    const transferAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Transfer" };
+    const transferAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Transfer", actionHandler: () => router.push("/stock-management") };
     const archiveAction: RowAction = {showWhenEditing: false, showWhenNotEditing: true, isPrimary: true, label: "Archive", actionHandler: () => archive()};
     const saveRow = async () => {
         toastifyFetch(`/api/chemicals/${chemical.id}`, {
