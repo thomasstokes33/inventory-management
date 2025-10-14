@@ -1,7 +1,7 @@
 "use client";
 import Table, { Row, RowAction, TableColumn } from "@/app/components/Table";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import formatLocation from "@/lib/locationFormatter";
+import {formatLocation} from "@/lib/formatter";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { StockRecord, stockSchema } from "@/schemas/stock";
 import { useRouter } from "next/navigation";
@@ -11,8 +11,8 @@ const stockDeletionColumns: TableColumn<StockDeletionRow>[] = [
     {field: "id", label: "ID"},
     {
         field: "location",
-        label: "Location", format: c => {
-            return formatLocation(c.location);
+        label: "Location", format: s => {
+            return formatLocation(s.location);
         }
     },
     { field: "chemical", label: "Chemical", format: c => c.chemical.name }

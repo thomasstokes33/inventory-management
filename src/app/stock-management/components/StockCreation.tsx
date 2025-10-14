@@ -2,7 +2,7 @@
 
 import { MinimalChemical } from "@/app/api/chemicals/route";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import formatLocation from "@/lib/locationFormatter";
+import { formatLocation } from "@/lib/formatter";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { LocationRecord } from "@/schemas/location";
 import { useRouter } from "next/navigation";
