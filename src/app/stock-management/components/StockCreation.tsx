@@ -1,6 +1,7 @@
 "use client";
 
 import { MinimalChemical } from "@/app/api/chemicals/route";
+import { useFuncDebounce } from "@/app/hooks/useDebounce";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { formatLocation } from "@/lib/formatter";
 import { toastifyFetch } from "@/lib/toastHelper";
@@ -16,21 +17,23 @@ type SelectOption = {
     value: number
     label: string
 }
+async function fetchChemicalOptions(inputChemical: string): Promise<SelectOption[]> {  // Moved outside as no state is used.
+    const res = await fetch(`${API_ROUTES.CHEMICALS}?query=${encodeURIComponent(inputChemical)}`);
+    if (!res.ok) return [];
+    else {
+        const data = await res.json();
+        const chemicals: MinimalChemical[] = data.chemicals;
+        return chemicals.map(item => ({ value: item.id, label: item.name }));
+    }
+};
+
 export default function StockCreation({ locations }: StockCreationDeletionProps) {
     const locationOptions: Options<SelectOption> = locations.map((loc) => ({
         value: loc.id, label: formatLocation(loc)
     }));
     const [selectedLocation, setSelectedLocation] = useState<SelectOption | null>(null);
     const [selectedChemical, setSelectedChemical] = useState<SelectOption | null>(null);
-    const fetchChemicalOptions: (inputChemical: string) => Promise<SelectOption[]> = async (inputChemical: string) => {
-        const res = await fetch(`${API_ROUTES.CHEMICALS}?query=${encodeURIComponent(inputChemical)}`);
-        if (!res.ok) return [];
-        else {
-            const data = await res.json();
-            const chemicals: MinimalChemical[] = data.chemicals;
-            return chemicals.map(item => ({ value: item.id, label: item.name }));
-        }
-    };
+    const debouncedFetchChemOptions = useFuncDebounce<string, SelectOption>(fetchChemicalOptions, 500);
     const resetForm = () => {
         setSelectedLocation(null);
         setSelectedChemical(null);
@@ -55,10 +58,10 @@ export default function StockCreation({ locations }: StockCreationDeletionProps)
         <div className="card-body">
             <form method="PUT" onSubmit={submitForm}>
                 <label className="form-label" htmlFor="stock-creation-chemical">Chemical</label>
-                <AsyncSelect defaultOptions  id="stock-creation-chemical" instanceId="chem" required onChange={setSelectedChemical} loadOptions={fetchChemicalOptions} cacheOptions value={selectedChemical} />
+                <AsyncSelect defaultOptions id="stock-creation-chemical" instanceId="chem" required onChange={setSelectedChemical} loadOptions={(input) => debouncedFetchChemOptions(input)} cacheOptions value={selectedChemical} isClearable />
                 <div className="mb-2">
                     <label htmlFor="stock-creation-location" className="form-label">Location</label>
-                    <Select instanceId="loc" required id="stock-creation-location" options={locationOptions} onChange={setSelectedLocation} value={selectedLocation}/>
+                    <Select instanceId="loc" required id="stock-creation-location" options={locationOptions} isClearable onChange={setSelectedLocation} value={selectedLocation} />
                 </div>
                 <div className="btn-group">
                     <button className="btn btn-primary" type="submit" >Submit</button>
