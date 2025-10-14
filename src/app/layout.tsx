@@ -31,6 +31,7 @@ export default function RootLayout({
             <Toaster position="bottom-center"/>
         <Nav/>
         {children}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer={true}></script>
       </body>
     </html>
   );

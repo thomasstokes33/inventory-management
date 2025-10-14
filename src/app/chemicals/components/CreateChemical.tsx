@@ -4,16 +4,9 @@ import { HazardClass, MaterialType, QuantityType, Status } from "@prisma/client"
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { API_ROUTES } from "@/lib/apiRoutes";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 type CreateChemicalProps = { hazardClasses: HazardClass[] }
 export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
-    useEffect(() => {
-        import("bootstrap").then(({Tooltip}) => {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"tooltip\"]"));
-            tooltipTriggerList.map((tooltipTriggerEl) => {
-                return new Tooltip(tooltipTriggerEl);
-            });
-        });
-    }, []); // useEffect runs after DOM creation.
     const router = useRouter();
     const [message, setMessage] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean| null>(null);
@@ -38,6 +31,11 @@ export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
             setMessage("Could not create chemical");
         }
     };
+    const tooltip = (
+        <Tooltip id="tooltip">
+            (only used if Quantity type is &quot;count&quot;)
+        </Tooltip>
+    );
     return (
         <div className="card">
             <div className="card-header">
@@ -71,7 +69,11 @@ export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
                     </select>
                     <div>
                         <label htmlFor="create-count">Count unit (add plural form in brackets)</label>
-                        <div><i className="bi bi-info-square" data-bs-toggle="tooltip" data-bs-placement="right" title="(only used if Quantity type is &quot;count&quot;)"></i></div>
+                        <div>
+                            <OverlayTrigger placement="right" overlay={tooltip}>
+                                <i className="bi bi-info-square"></i>
+                            </OverlayTrigger>
+                        </div>
                         <input id="create-count" name="unit" type="string" className="form-control" required={false} />
                     </div>
                     <div className="mt-2">
