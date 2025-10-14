@@ -2,7 +2,7 @@
 import "bootstrap-icons/font/bootstrap-icons.min.css";
 import { HazardClass, MaterialType, QuantityType, Status } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 type CreateChemicalProps = { hazardClasses: HazardClass[] }
