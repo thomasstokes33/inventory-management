@@ -6,3 +6,4 @@ export const supplierSchema = z.object({
     name: z.string(),
     email: z.email(),
 });
+export type SupplierRecord = z.infer<typeof supplierSchema>;
