@@ -2,6 +2,7 @@
 import Table, { Row, RowAction, TableColumn } from "@/app/components/Table";
 import useDebounce from "@/app/hooks/useDebounce";
 import { API_ROUTES } from "@/lib/apiRoutes";
+import { formatQuantity } from "@/lib/formatter";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { ChemicalRecordWithTotalStock } from "@/schemas/chemical";
 import { MaterialType, Status } from "@prisma/client";
@@ -39,25 +40,7 @@ export const chemicalTableColumns: TableColumn<ChemicalRowData>[] = [
         hideBelow: "sm"
     },
     {
-        field: "totalQuantity", label: "Quantity", format: (c) => {
-            let unit: string;
-            const defaultUnit = "units";
-            switch (c.quantityType) {
-                case "MASS":
-                    unit = "g";
-                    break;
-                case "VOLUME":
-                    unit = "ml";
-                    break;
-                case "COUNT":
-                    unit = c.unit ?? defaultUnit;
-                    break;
-                default:
-                    unit = defaultUnit;
-                    break;
-            }
-            return `${c.totalQuantity} ${unit}`;
-        }
+        field: "totalQuantity", label: "Quantity", format: (c) => formatQuantity(c.totalQuantity, c.quantityType, c.unit)
     }
 ];
 

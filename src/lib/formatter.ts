@@ -9,3 +9,22 @@ export function formatLocation(locRecord: LocationRecord) {
     return parts.join(" — ");
 }
 
+export function formatQuantity(quantity: number, quantityType: QuantityType, unit: string | null) {
+    let u: string;
+    const defaultUnit = "units";
+    switch (quantityType) {
+        case "MASS":
+            u = "g";
+            break;
+        case "VOLUME":
+            u = "ml";
+            break;
+        case "COUNT":
+            u = unit ?? defaultUnit;
+            break;
+        default:
+            u = defaultUnit;
+            break;
+    }
+    return `${quantity} ${u}`;
+}
