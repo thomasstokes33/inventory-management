@@ -4,6 +4,8 @@ import StockCreation from "./components/StockCreation";
 import { LocationRecord, locationSchema } from "@/schemas/location";
 import StockDeletion from "./components/StockDeletion";
 import { stockSchema } from "@/schemas/stock";
+import StockMovementPanel from "./components/StockMovementPanel";
+import { supplierSchema } from "@/schemas/supplier";
 export  default async function IssueReceipt({ }) {
     const handleGoodsIssueReceipt = async () => {
     };
@@ -16,6 +18,8 @@ export  default async function IssueReceipt({ }) {
     });
     const stocks = rawStock.map((stock) => stockSchema.parse(stock));
     const locations : LocationRecord[] = rawLocations.map((loc) => locationSchema.parse(loc));
+    const rawSuppliers = await prisma.supplier.findMany();
+    const suppliers = rawSuppliers.map(sup => supplierSchema.parse(sup));
     return (<div className="container-lg mt-5">
         <div className="row">
             <div className="col-md-6">
@@ -23,22 +27,7 @@ export  default async function IssueReceipt({ }) {
                 <StockDeletion stock={stocks}/>
             </div>
             <div className="col-md-6">
-                <div className="card">
-                    <div className="card-header">Goods issue/receipt</div>
-                    <div className="card-body">
-                        <form>
-                            <label>stock</label>
-                            <input className="form-control"></input>
-                            <label>quantity</label>
-                            <input className="form-control"></input>
-                            <label>movement type</label>
-                            <input className="form-control"></input>
-                            <label>amount</label>
-                            <input className="form-control"></input>
-                        </form>
-                    </div>
-                </div>
-
+                <StockMovementPanel suppliers={suppliers}/>
             </div>
         </div>
     </div>);
