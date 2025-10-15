@@ -23,7 +23,6 @@ export function useFuncDebounce<I, R >(func: (...args: I[]) => Promise<R[]>, del
         }
         timeout.current = window.setTimeout(async () => {
             const res = await func(...args);
-            console.log(res);
             resolve(res);
         }, delay);
     });
