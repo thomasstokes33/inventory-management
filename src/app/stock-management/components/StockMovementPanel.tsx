@@ -1,7 +1,7 @@
 "use client";
 
 import { CostType, MovementType } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import Select, { Options } from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
@@ -90,6 +90,7 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
     const [supplier, setSupplier] = useState<null | StockMovementOption<SupplierRecord>>(null);
     const debouncedFetchChemicals = useFuncDebounce<string, StockMovementOption<MinimalChemical>>(fetchPermittedChemicalsOptions, 500);
     const debouncedFetchLocations = useFuncDebounce<string, StockMovementOption<LocationRecord>>(fetchPermittedLocationOptions, 500);
+    const router = useRouter();
     const [filteredChemicalsOptions, setFilteredChemicalsOptions] = useState<null | StockMovementOption<MinimalChemical>[]>(null);
     const [filteredLocationsOptions, setFilteredLocationsOptions] = useState<null | StockMovementOption<LocationRecord>[]>(null);
     const filteredCostTypeOptions = movementType ? costTypeOptions[movementType.value] : [];
@@ -125,10 +126,36 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
             setCostType(costTypeOptions[newMovType.value][0]);
         }
     };
+    const submitHandler = async (formEvent: FormEvent<HTMLFormElement>) => {
+        formEvent.preventDefault();
+        const formData = new FormData(formEvent.currentTarget);
+        if (!movementType || !supplier || !chem || chem.value != loc?.value) return;
+        const stockMovement: StockMovementNonNested = {
+            cost: Number(formData.get("cost")),
+            quantity: Number(formData.get("quantity")),
+            ...(moveDate ? { createdAt: moveDate } : {}),
+            movementType: movementType.value,
+            supplierId: supplier.value,
+            stockId: chem.value
+        };
+        toastifyFetch(API_ROUTES.STOCK_MOVEMENT, {
+            method: "PUT",
+            body: JSON.stringify(stockMovement)
+        }, {
+            loading: "Processing stock movement",
+            success: "Stock movememnt successful",
+            error: "Stock movememnt unsuccessful"
+        }, () => {
+            reset();
+           router.refresh(); 
+        }, () => {});
+    };
+
+
     return (<div className="card">
         <div className="card-header">Goods issue/receipt</div>
         <div className="card-body">
-            <form>
+            <form method="PUT" onSubmit={submitHandler}>
                 <div className="d-sm-flex border">
                     <div className="flex-grow-1 p-2">
                         <label htmlFor="stock-movement-chemical">Chemical</label>
