@@ -124,8 +124,9 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
                 <label htmlFor="stock-movement-quantity">Quantity</label>
                 <input className="form-control" id="stock-movement-quantity"></input>
                 <label htmlFor="stock-movement-date">Date</label>
-                <div>
-                    <DatePicker dateFormat="MMMM d, yyyy h:mm aa" showTimeSelect withPortal showIcon selected={moveDate} onChange={setMoveDate} id="stock-movement-date" />
+                <div className="btn-group mt-2">
+                    <button className="btn btn-primary" type="submit">Submit</button>
+                    <button className="btn btn-secondar" type="reset" onClick={reset}>Reset</button>
                 </div>
             </form>
         </div>
