@@ -74,12 +74,11 @@ const costTypeOptions: { [K in MovementType]: StockMovementOption<CostType>[] } 
     ISSUE: [{ value: "SELL", label: "sell" }],
     RECEIPT: [{ value: "PURCHASE", label: "purchase" }],
     TRANSFER_IN: [{ value: "TRANSFER", label: "N/A" }],
-    TRANSFER_OUT: [{ value: "TRANSFER", label: "transfer out" }],
+    TRANSFER_OUT: [{ value: "TRANSFER", label: "transfer" }],
     DISCARD: [{ value: "NONE", label: "N/A" }],
-    RETURN: [{ value: "NONE", label: "N/A" }, { value: "TRANSFER", label: "Return cost" }],
-    PRODUCTION_OUTPUT: [{ value: "PRODUCE", label: "production" }],
-    PRODUCTION_USE: [{ value: "NONE", label: "N/A" }]
-
+    RETURN: [{ value: "NONE", label: "N/A" }, { value: "TRANSFER", label: "return cost" }],
+    PRODUCTION_MADE: [{ value: "NONE", label: "N/A" }],
+    PRODUCTION_USE: [{ value: "PRODUCE", label: "production" }]
 };
 export default function StockMovementPanel({ suppliers, stockCount }: StockMovementPanelProps) {
     const [chem, setChem] = useState<null | StockMovementOption<ChemicalRecord>>(null);
