@@ -199,7 +199,7 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
                 <DatePicker className="w-100" isClearable dateFormat="MMMM d, yyyy h:mm aa" showTimeSelect withPortal showIcon selected={moveDate} onChange={setMoveDate} id="stock-movement-date" />
                 <div className="btn-group mt-2">
                     <button className="btn btn-primary" type="submit">Submit</button>
-                    <button className="btn btn-secondar" type="reset" onClick={reset}>Reset</button>
+                    <button className="btn btn-secondary" type="reset" onClick={reset}>Reset</button>
                 </div>
             </form>
         </div>
