@@ -38,7 +38,12 @@ enum MaterialType {
 enum MovementType {
     ISSUE // Goods out. Includes used, sold or wasted.
     RECEIPT
-    TRANSFER
+    TRANSFER_OUT
+    TRANSFER_IN
+    PRODUCTION_USE
+    PRODUCTION_MADE
+    DISCARD
+    RETURN
 }
 
 
@@ -103,13 +108,13 @@ model StockMovement {
     createdAt DateTime @default(now()) // No modified as it is "immutable"
     quantity Float
     movementType MovementType
-    supplierId Int
-    supplier Supplier @relation(fields: [supplierId], references: [id]) // Assumes single supplier for a stock at a location.
+    supplierId Int?
+    supplier Supplier? @relation(fields: [supplierId], references: [id]) // Assumes single supplier for a stock at a location.
     stockId Int
     stock Stock @relation(fields: [stockId], references: [id])
-    cost Float?
-    costType CostType?
+    cost Float @default(0)
+    costType CostType @default(NONE)
     @@index([supplierId])
 }
 
-// TODO: Extend to include BOM, recipies and orders, which contain many StockMovements.
+// TODO: Extend to include BOM, recipes and orders, which contain many StockMovements.
