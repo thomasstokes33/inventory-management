@@ -132,29 +132,44 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
                 <div className="d-sm-flex border">
                     <div className="flex-grow-1 p-2">
                         <label htmlFor="stock-movement-chemical">Chemical</label>
-                        <AsyncSelect defaultOptions={filteredChemicalsOptions} instanceId="mat" id="stock-movement-chemical" options={filteredChemicalsOptions} loadOptions={(input: string) => debouncedFetch(input)} cacheOptions/>
+                        <AsyncSelect instanceId="mat" id="stock-movement-chemical"
+                            isLoading={!filteredChemicalsOptions}
+                            defaultOptions={filteredChemicalsOptions ?? []}
+                            isClearable
+                            value={chem}
+                            cacheOptions
+                            loadOptions={v => debouncedFetchChemicals(v)}
+                            onChange={handleChemChange} />
                     </div>
                     <div className="flex-grow-1 p-2">
                         <label htmlFor="stock-movement-location">Location</label>
-                        <AsyncSelect defaultOptions instanceId="loc" id="stock-movement-location" />
+                        <AsyncSelect instanceId="loc" id="stock-movement-location"
+                            isLoading={!filteredLocationsOptions}
+                            defaultOptions={filteredLocationsOptions ?? []}
+                            isClearable
+                            value={loc}
+                            loadOptions={v => debouncedFetchLocations(v)}
+                            cacheOptions
+                            onChange={handleLocChange} />
                     </div>
                 </div>
                 <div className="border p-2 mt-1">
                     <label htmlFor="stock-movement-movement-type">Movement type</label>
-                    <Select instanceId="mov" id="stock-movement-movement-type" options={movementTypeOptions} value={movementType} onChange={setMovementType}/>
+                    <Select instanceId="mov" id="stock-movement-movement-type" options={movementTypeOptions} value={movementType} onChange={handleMovementTypeChange} />
                     {movementType && <div>
                         <label htmlFor="stock-movement-cost-type">Cost Type</label>
                         {/* Cost type is limitied by the movement type. ISSUE is only purchase */}
-                        <Select instanceId="cost-type" id="stock-movement-cost-type" options={filteredCostTypeOptions} value={costType} onChange={setCostType}/>
+                        <Select instanceId="cost-type" id="stock-movement-cost-type" options={filteredCostTypeOptions} value={costType} onChange={setCostType} />
                     </div>}
                 </div>
                 <label htmlFor="stock-movement-supplier">Supplier</label>
-                <Select instanceId="sup" id="stock-movement-supplier" options={supplierOptions} value={supplier} onChange={setSupplier}/>
+                <Select instanceId="sup" id="stock-movement-supplier" options={supplierOptions} value={supplier} onChange={setSupplier} />
                 <label htmlFor="stock-movement-cost">Cost</label>
-                <input className="form-control" id="stock-movement-cost"></input>
+                <input className="form-control" id="stock-movement-cost" name="cost"></input>
                 <label htmlFor="stock-movement-quantity">Quantity</label>
-                <input className="form-control" id="stock-movement-quantity"></input>
+                <input className="form-control" id="stock-movement-quantity" name="quantity"></input>
                 <label htmlFor="stock-movement-date">Date</label>
+                <DatePicker className="w-100" isClearable dateFormat="MMMM d, yyyy h:mm aa" showTimeSelect withPortal showIcon selected={moveDate} onChange={setMoveDate} id="stock-movement-date" />
                 <div className="btn-group mt-2">
                     <button className="btn btn-primary" type="submit">Submit</button>
                     <button className="btn btn-secondar" type="reset" onClick={reset}>Reset</button>
