@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         );
     } else {
         const supplier = await prisma.supplier.create({ data: res.data });
-        response = NextResponse.json({success: supplier}, {status: 200});
+        response = NextResponse.json({data: supplier}, {status: 200});
     }
     return response;
 

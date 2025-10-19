@@ -27,7 +27,7 @@ export async function PUT(request: Request) {
                 stockQuantity: 0
             }
         });
-        return NextResponse.json({ stock: stock }, { status: 200 });
+        return NextResponse.json({ data: stock }, { status: 200 });
     } catch (err) {
         console.log((err as PrismaClientKnownRequestError).message);
         return NextResponse.json({error: "Invalid ID combination"}, {status: 400});

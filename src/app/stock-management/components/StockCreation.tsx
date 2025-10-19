@@ -1,6 +1,6 @@
 "use client";
 
-import { MinimalChemical } from "@/app/api/chemicals/route";
+import { MinimalChemical, VALID_CHEMICAL_GET_PARAMS } from "@/app/api/chemicals/route";
 import { useFuncDebounce } from "@/app/hooks/useDebounce";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { formatLocation } from "@/lib/formatter";
@@ -18,13 +18,11 @@ type SelectOption = {
     label: string
 }
 async function fetchChemicalOptions(inputChemical: string): Promise<SelectOption[]> {  // Moved outside as no state is used.
-    const res = await fetch(`${API_ROUTES.CHEMICALS}?query=${encodeURIComponent(inputChemical)}`);
+    const res = await fetch(`${API_ROUTES.CHEMICALS}?${VALID_CHEMICAL_GET_PARAMS.query}=${encodeURIComponent(inputChemical)}`);
     if (!res.ok) return [];
-    else {
-        const data = await res.json();
-        const chemicals: MinimalChemical[] = data.chemicals;
-        return chemicals.map(item => ({ value: item.id, label: item.name }));
-    }
+    const data = await res.json();
+    const chemicals: MinimalChemical[] = data.data;
+    return chemicals.map(item => ({ value: item.id, label: item.name }));
 };
 
 export default function StockCreation({ locations }: StockCreationDeletionProps) {

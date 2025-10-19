@@ -1,6 +1,7 @@
+import { generateResponse } from "@/lib/apiRoutes";
 import prisma from "@/lib/prisma";
 import { chemicalSchema } from "@/schemas/chemical";
-import { Status } from "@prisma/client";
+import { Chemical, Status } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 const MAX_QUERY_LENGTH = 15;
@@ -13,9 +14,9 @@ export type MinimalChemical = {
 
 async function getInitialChemicalsResponse() {
     const chemicals = await prisma.chemical.findMany({ where: { status: { not: "ARCHIVED" } }, take: MAX_CHEMICALS_RETURNED });
-    return NextResponse.json({ chemicals: chemicals }, { status: 200 });
+    return generateResponse<Chemical[]>({data: chemicals}, 200);
 }
-
+export const VALID_CHEMICAL_GET_PARAMS= {query: "query"} as const;
 export async function GET(request: NextRequest) {
     const searchParams: URLSearchParams = request.nextUrl.searchParams;
     console.log(searchParams);
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
                 ]
             }
         });
-        return NextResponse.json({ chemicals: chemicals }, { status: 200 });
+        return generateResponse<MinimalChemical[]>({data: chemicals}, 200);
     }
 }
 
@@ -65,7 +66,7 @@ export async function PUT(request: Request) {
         return NextResponse.json({ errors }, { status: 400 });
     }
     const chemical = await prisma.chemical.create({ data: { ...parsedChemical, hazardClass: { connect: formHazardClasses } } });
-    return NextResponse.json({ chemical: chemical }, { status: 200 });
+    return NextResponse.json({ data: chemical }, { status: 200 });
 }
 
 function validateChemical(newChemical: Record<string, string | string[]>): { valid: ChemicalCreation | null, errors: FormError[] } {
