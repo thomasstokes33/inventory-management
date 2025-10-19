@@ -109,6 +109,22 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
     useEffect(() => {
         fetchPermittedLocationOptions("").then(setFilteredLocationsOptions);
     }, [stockCount]);
+    const handleLocChange = (newLoc: StockMovementOption<LocationRecord> | null) => {
+        setLoc(newLoc);
+        if (!newLoc || !filteredLocationsOptions?.includes(newLoc)) setChem(null);
+        fetchLocationFilteredChemicalOptions(newLoc).then((ops) => { console.log("loc filtered", ops); setFilteredChemicalsOptions(ops); }); // Otherwise, get all chemicals that match the given location.
+    };
+    const handleChemChange = (newChem: StockMovementOption<MinimalChemical> | null) => {
+        setChem(newChem);
+        if (!newChem || !filteredChemicalsOptions?.includes(newChem)) setLoc(null);
+        fetchChemicalFilteredLocationOptions(newChem).then(ops => { console.log(ops); setFilteredLocationsOptions(ops); });
+    };
+    const handleMovementTypeChange = (newMovType: StockMovementOption<MovementType> | null) => {
+        setMovementType(newMovType);
+        if (newMovType?.value) {
+            setCostType(costTypeOptions[newMovType.value][0]);
+        }
+    };
     return (<div className="card">
         <div className="card-header">Goods issue/receipt</div>
         <div className="card-body">
