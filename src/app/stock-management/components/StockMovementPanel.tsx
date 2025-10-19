@@ -103,6 +103,12 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
         fetchPermittedLocationOptions("").then(setFilteredLocationsOptions);
         fetchPermittedChemicalsOptions("").then(setFilteredChemicalsOptions); // If there are no options, get all chemicals in the stock table.
     };
+    useEffect(() => {
+        fetchPermittedChemicalsOptions("").then(setFilteredChemicalsOptions); // If there are no options, get all chemicals in the stock table.
+    }, [stockCount]);
+    useEffect(() => {
+        fetchPermittedLocationOptions("").then(setFilteredLocationsOptions);
+    }, [stockCount]);
     return (<div className="card">
         <div className="card-header">Goods issue/receipt</div>
         <div className="card-body">
