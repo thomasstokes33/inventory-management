@@ -1,6 +1,6 @@
 "use client";
 
-import { CostType, MovementType, Supplier } from "@prisma/client";
+import { CostType, MovementType } from "@prisma/client";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import Select, { Options } from "react-select";
@@ -10,13 +10,15 @@ import { ChemicalRecord } from "@/schemas/chemical";
 import { LocationRecord } from "@/schemas/location";
 import AsyncSelect from "react-select/async";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { MinimalChemical } from "@/app/api/chemicals/route";
 import { useFuncDebounce } from "@/app/hooks/useDebounce";
-import { number } from "zod";
-type StockMovementOption<T> = { label: string, value: T };
-type StockMovementPanelProps =  {suppliers: SupplierRecord[]}; 
-async function fetchChemicalOptions(inputChemical: string): Promise<StockMovementOption<number>[]> {  // Moved outside as no state is used.
-    const res = await fetch(`${API_ROUTES.CHEMICALS}?query=${encodeURIComponent(inputChemical)}`);
+import { VALID_STOCK_GET_PARAMS } from "@/app/api/stocks/route";
+import { StockRecord } from "@/schemas/stock";
+import { MinimalChemical } from "@/app/api/chemicals/route";
+import { formatLocation } from "@/lib/formatter";
+import { StockMovementNonNested } from "@/schemas/stockMovement";
+import { toastifyFetch } from "@/lib/toastHelper";
+import { useRouter } from "next/navigation";
+type StockMovementOption<T> = T extends { id: number } ? { label: string, value: T["id"] } : { label: string, value: T };
     if (!res.ok) return [];
     else {
         const data = await res.json();
