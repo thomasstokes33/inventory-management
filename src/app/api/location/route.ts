@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         );
     } else {
         const location = await prisma.location.create({ data: res.data });
-        response = NextResponse.json({success: location}, {status: 200});
+        response = NextResponse.json({data: location}, {status: 200});
     }
     return response;
 
