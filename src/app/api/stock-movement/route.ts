@@ -1,7 +1,7 @@
 import { generateResponse } from "@/lib/apiRoutes";
 import prisma from "@/lib/prisma";
-import { stockMovementSchemaNonNested } from "@/schemas/stockMovement";
-import { MovementType, Prisma, StockMovement } from "@prisma/client";
+import { getMovementTypeSign, stockMovementCreationSchema } from "@/schemas/stockMovement";
+import { MovementType, Prisma, Stock, StockMovement } from "@prisma/client";
 import z from "zod";
 export async function GET() {
     const stockMovements = await prisma.stockMovement.findMany();
@@ -24,44 +24,44 @@ export async function PUT(request: Request) {
         newStockMovement.createdAt = createdAt;
     }
     // type validation
-    const validatedStockMovement = stockMovementSchemaNonNested.safeParse(newStockMovement);
+    const validatedStockMovement = stockMovementCreationSchema.safeParse(newStockMovement);
     if (validatedStockMovement.error) {
         console.log(z.formatError(validatedStockMovement.error));
         return generateResponse<StockMovement>({ error: "Invalid types" }, 400);
     }
-    const { supplierId, stockId, quantity: quantityChange, ...rest } = validatedStockMovement.data;
+    // Extract key values.
+    const { chemicalId, locationId, quantity: quantityChange, ...rest } = validatedStockMovement.data;
+    const stock = await prisma.stock.findFirst({ select: { id: true, stockQuantity: true }, where: { chemicalId: chemicalId, locationId: locationId} });
+    if (!stock) return generateResponse({ error: "Invalid Stock ID" }, 400);
     try {
-        const stock = await prisma.stock.findUnique({ select: { stockQuantity: true }, where: { id: stockId } });
-        if (!stock) return generateResponse({error: "Invalid Stock ID"}, 400);
-        let newBalance : number;
-        switch (rest.movementType) {
-            case MovementType.TRANSFER_OUT:
-            case MovementType.ISSUE:
-                if ( quantityChange > stock.stockQuantity) return generateResponse<StockMovement>({ error: "Invalid quantity for movement type" }, 400);
-                newBalance = stock.stockQuantity - quantityChange;
-                break;
-            case MovementType.RECEIPT:
-                newBalance = stock.stockQuantity + quantityChange;
-                break;
+        const change =  getMovementTypeSign(rest.movementType);
+        if (change < 0 && quantityChange > stock.stockQuantity) {
+            console.log("Insufficient quantity for transfer"); // Possible complexity, regarding dates of transactions.
+            return generateResponse<StockMovement>({ error: "Invalid quantity for movement type" }, 400);
         }
+        const newBalance = stock.stockQuantity + change * quantityChange;
+        const stockMovementCreationData: Prisma.StockMovementCreateInput = {
+            movementType: rest.movementType,
+            createdAt: rest.createdAt,
+            cost: rest.cost,
+            costType: rest.costType,
+            stock: { connect: { id: stock.id} },
+            quantity: quantityChange,
+        };
+        if (rest.movementType === MovementType.RECEIPT) stockMovementCreationData.supplier = {connect: {id: rest.supplierId}};
+        // Atomic transaction. TODO: Handle transfers and recipes, so that we maintain Consistency of ACID.
         const [stockMovement, updatedStock] = await prisma.$transaction([
             prisma.stockMovement.create({
-                data: {
-                    ...rest,
-                    stock: { connect: { id: stockId } },
-                    supplier: { connect: { id: supplierId } },
-                    quantity: quantityChange
-                },
+                data: stockMovementCreationData
             }),
             prisma.stock.update({
-                where: {id: stockId},
+                where: { id: stock.id },
                 data: {
                     stockQuantity: newBalance
                 }
             })
         ]);
-        //TODO: update the stock quantity too.
-        return generateResponse<StockMovement>({ data: stockMovement }, 200);
+        return generateResponse<{ stockMovement: StockMovement, stock: Stock }>({ data: { stockMovement: stockMovement, stock: updatedStock } }, 200);
     } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) return generateResponse<StockMovement>({ error: "invalid IDs" }, 400);
         return generateResponse<StockMovement>({ error: "unknown error" }, 400);

@@ -9,15 +9,16 @@ import { SupplierRecord } from "@/schemas/supplier";
 import { ChemicalRecord } from "@/schemas/chemical";
 import { LocationRecord } from "@/schemas/location";
 import AsyncSelect from "react-select/async";
-import { API_ROUTES } from "@/lib/apiRoutes";
+import { API_ROUTES, ApiResponse } from "@/lib/apiRoutes";
 import { useFuncDebounce } from "@/app/hooks/useDebounce";
 import { VALID_STOCK_GET_PARAMS } from "@/app/api/stocks/route";
 import { StockRecord } from "@/schemas/stock";
 import { MinimalChemical } from "@/app/api/chemicals/route";
 import { formatLocation } from "@/lib/formatter";
-import { StockMovementNonNested } from "@/schemas/stockMovement";
+import { StockMovementCreationSchema, StockMovementNonNested } from "@/schemas/stockMovement";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 type StockMovementOption<T> = T extends { id: number } ? { label: string, value: T["id"] } : { label: string, value: T };
 type StockMovementPanelProps = { suppliers: SupplierRecord[], stockCount: number };
 
@@ -57,7 +58,7 @@ async function fetchPermittedChemicalsOptions(inputChem: string): Promise<StockM
     params.set(VALID_STOCK_GET_PARAMS.chemicalName, inputChem);
     params.set(VALID_STOCK_GET_PARAMS.distinctChem, String(true));
     const stocks = await fetchStocks(params);
-    return stocks.map(s => ({ value: s.id, label: s.chemical.name })); // uses stock id.
+    return stocks.map(s => ({ value: s.chemicalId, label: s.chemical.name })); // uses stock id.
 }
 
 async function fetchPermittedLocationOptions(inputLocation: string): Promise<StockMovementOption<LocationRecord>[]> {
@@ -65,7 +66,7 @@ async function fetchPermittedLocationOptions(inputLocation: string): Promise<Sto
     params.set(VALID_STOCK_GET_PARAMS.locationName, inputLocation);
     params.set(VALID_STOCK_GET_PARAMS.distinctLoc, String(true));
     const stocks = await fetchStocks(params);
-    return stocks.map(s => ({ value: s.id, label: formatLocation(s.location) }));
+    return stocks.map(s => ({ value: s.locationId, label: formatLocation(s.location) }));
 }
 
 const movementTypeOptions: Options<StockMovementOption<MovementType>> = Object.values(MovementType).map(val => ({ label: val.toLocaleLowerCase(), value: val }));
@@ -125,33 +126,40 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
         }
     };
     const submitHandler = async (formEvent: FormEvent<HTMLFormElement>) => {
+        const form = formEvent.currentTarget;
         formEvent.preventDefault();
         const formData = new FormData(formEvent.currentTarget);
-        if (!movementType || !supplier || !chem || chem.value != loc?.value) return;
+        if (!movementType || !chem || !loc || !costType) {
+            toast.error("Missing types");
+            return;
+        }
         if (movementType.value === MovementType.RECEIPT && !supplier) {
             toast.error("No supplier specified");
             return;
         }
+        const stockMovement : StockMovementCreationSchema = {
             cost: Number(formData.get("cost")),
             quantity: Number(formData.get("quantity")),
             ...(moveDate ? { createdAt: moveDate } : {}),
             movementType: movementType.value,
-            supplierId: supplier.value,
-            stockId: chem.value
+            supplierId: supplier?.value ?? -1,
+            chemicalId: chem.value,
+            locationId: loc.value,
+            costType: costType.value
         };
-        toastifyFetch(API_ROUTES.STOCK_MOVEMENT, {
+        toastifyFetch<ApiResponse<StockMovementNonNested>>(API_ROUTES.STOCK_MOVEMENT, {
             method: "PUT",
             body: JSON.stringify(stockMovement)
         }, {
             loading: "Processing stock movement",
-            success: "Stock movememnt successful",
-            error: "Stock movememnt unsuccessful"
+            success: "Stock movement successful",
+            error: "Stock movement unsuccessful"
         }, () => {
             reset();
-           router.refresh(); 
-        }, () => {});
+            form.reset();
+            router.refresh();
+        }, ()=>{});
     };
-
 
     return (<div className="card">
         <div className="card-header">Goods issue/receipt</div>
