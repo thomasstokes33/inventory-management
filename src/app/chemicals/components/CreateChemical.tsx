@@ -2,34 +2,28 @@
 import "bootstrap-icons/font/bootstrap-icons.min.css";
 import { HazardClass, MaterialType, QuantityType, Status } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent } from "react";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { toastifyFetch } from "@/lib/toastHelper";
 type CreateChemicalProps = { hazardClasses: HazardClass[] }
 export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
     const router = useRouter();
-    const [message, setMessage] = useState<string | null>(null);
-    const [success, setSuccess] = useState<boolean| null>(null);
     const handleCreateSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setMessage(null);
-        setSuccess(null);
         const form = e.currentTarget;
         const formData = new FormData(form);
-        const res = await fetch(API_ROUTES.CHEMICALS, {
+        toastifyFetch(API_ROUTES.CHEMICALS, {
             method: "PUT",
             body: formData
-        });
-        await res.json();
-        if (res.ok) {
-            setSuccess(true);
-            setMessage("Successfully added chemical");
+        }, {
+            error: "Could not create chemical",
+            success: "Successfully added chemical",
+            loading: "Attempting to create chemical"
+        }, () => {
             form.reset();
-            router.refresh(); // reloads components without reloading page.
-        } else {
-            setSuccess(false);
-            setMessage("Could not create chemical");
-        }
+            router.refresh();
+        }, () => {});
     };
     const tooltip = (
         <Tooltip id="tooltip">
@@ -80,7 +74,6 @@ export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
                         <button type="submit" className="btn btn-primary me-2">Add Chemical</button>
                         <button type="reset" className="btn btn-secondary">Reset</button>
                     </div>
-                    {message !== null && <div className={`alert alert-${success ? "success":"danger"}`}>{message}</div>}
                 </form>
             </div>
         </div>
