@@ -128,7 +128,10 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
         formEvent.preventDefault();
         const formData = new FormData(formEvent.currentTarget);
         if (!movementType || !supplier || !chem || chem.value != loc?.value) return;
-        const stockMovement: StockMovementNonNested = {
+        if (movementType.value === MovementType.RECEIPT && !supplier) {
+            toast.error("No supplier specified");
+            return;
+        }
             cost: Number(formData.get("cost")),
             quantity: Number(formData.get("quantity")),
             ...(moveDate ? { createdAt: moveDate } : {}),
