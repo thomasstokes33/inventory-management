@@ -93,6 +93,7 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
     const [filteredChemicalsOptions, setFilteredChemicalsOptions] = useState<null | StockMovementOption<MinimalChemical>[]>(null);
     const [filteredLocationsOptions, setFilteredLocationsOptions] = useState<null | StockMovementOption<LocationRecord>[]>(null);
     const filteredCostTypeOptions = movementType ? costTypeOptions[movementType.value] : [];
+    const supplierOptions: Options<StockMovementOption<SupplierRecord>> = suppliers.map(sup => ({ value: sup.id, label: sup.name }));
     return (<div className="card">
         <div className="card-header">Goods issue/receipt</div>
         <div className="card-body">
