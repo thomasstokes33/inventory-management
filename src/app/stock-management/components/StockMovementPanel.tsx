@@ -158,8 +158,8 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
             <form method="PUT" onSubmit={submitHandler}>
                 <div className="d-sm-flex border">
                     <div className="flex-grow-1 p-2">
-                        <label htmlFor="stock-movement-chemical">Chemical</label>
-                        <AsyncSelect instanceId="mat" id="stock-movement-chemical"
+                        <label htmlFor="chemical">Chemical</label>
+                        <AsyncSelect instanceId="mat" id="chemical"
                             isLoading={!filteredChemicalsOptions}
                             defaultOptions={filteredChemicalsOptions ?? []}
                             isClearable
@@ -169,8 +169,8 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
                             onChange={handleChemChange} />
                     </div>
                     <div className="flex-grow-1 p-2">
-                        <label htmlFor="stock-movement-location">Location</label>
-                        <AsyncSelect instanceId="loc" id="stock-movement-location"
+                        <label htmlFor="location">Location</label>
+                        <AsyncSelect instanceId="loc" id="location"
                             isLoading={!filteredLocationsOptions}
                             defaultOptions={filteredLocationsOptions ?? []}
                             isClearable
@@ -181,22 +181,24 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
                     </div>
                 </div>
                 <div className="border p-2 mt-1">
-                    <label htmlFor="stock-movement-movement-type">Movement type</label>
-                    <Select instanceId="mov" id="stock-movement-movement-type" options={movementTypeOptions} value={movementType} onChange={handleMovementTypeChange} />
+                    <label htmlFor="movement-type">Movement type</label>
+                    <Select instanceId="mov" id="movement-type" options={movementTypeOptions} value={movementType} onChange={handleMovementTypeChange} />
                     {movementType && <div>
-                        <label htmlFor="stock-movement-cost-type">Cost Type</label>
+                        <label htmlFor="cost-type">Cost Type</label>
                         {/* Cost type is limitied by the movement type. ISSUE is only purchase */}
-                        <Select instanceId="cost-type" id="stock-movement-cost-type" options={filteredCostTypeOptions} value={costType} onChange={setCostType} />
+                        <Select instanceId="cost-type" id="cost-type" options={filteredCostTypeOptions} value={costType} onChange={setCostType} />
+                        <label htmlFor="cost">Cost</label>
+                        <input className="form-control" id="cost" name="cost" type="number" defaultValue={0} required></input>
                     </div>}
+                    {movementType?.value === "RECEIPT" && <>
+                        <label htmlFor="supplier">Supplier</label>
+                        <Select instanceId="sup" id="supplier" options={supplierOptions} value={supplier} onChange={setSupplier} />
+                    </>}
                 </div>
-                <label htmlFor="stock-movement-supplier">Supplier</label>
-                <Select instanceId="sup" id="stock-movement-supplier" options={supplierOptions} value={supplier} onChange={setSupplier} />
-                <label htmlFor="stock-movement-cost">Cost</label>
-                <input className="form-control" id="stock-movement-cost" name="cost"></input>
-                <label htmlFor="stock-movement-quantity">Quantity</label>
-                <input className="form-control" id="stock-movement-quantity" name="quantity"></input>
-                <label htmlFor="stock-movement-date">Date</label>
-                <DatePicker className="w-100" isClearable dateFormat="MMMM d, yyyy h:mm aa" showTimeSelect withPortal showIcon selected={moveDate} onChange={setMoveDate} id="stock-movement-date" />
+                <label htmlFor="quantity">Quantity</label>
+                <input className="form-control" id="quantity" name="quantity" required type="quantity"></input>
+                <label htmlFor="date">Date</label>
+                <DatePicker className="w-100" isClearable dateFormat="MMMM d, yyyy h:mm aa" showTimeSelect withPortal showIcon selected={moveDate} onChange={setMoveDate} id="date" />
                 <div className="btn-group mt-2">
                     <button className="btn btn-primary" type="submit">Submit</button>
                     <button className="btn btn-secondary" type="reset" onClick={reset}>Reset</button>
