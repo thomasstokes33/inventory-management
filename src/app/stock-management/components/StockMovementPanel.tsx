@@ -94,6 +94,15 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
     const [filteredLocationsOptions, setFilteredLocationsOptions] = useState<null | StockMovementOption<LocationRecord>[]>(null);
     const filteredCostTypeOptions = movementType ? costTypeOptions[movementType.value] : [];
     const supplierOptions: Options<StockMovementOption<SupplierRecord>> = suppliers.map(sup => ({ value: sup.id, label: sup.name }));
+    const reset = async () => {
+        setChem(null);
+        setLoc(null);
+        setMovementType(null);
+        setSupplier(null);
+        setMoveDate(null);
+        fetchPermittedLocationOptions("").then(setFilteredLocationsOptions);
+        fetchPermittedChemicalsOptions("").then(setFilteredChemicalsOptions); // If there are no options, get all chemicals in the stock table.
+    };
     return (<div className="card">
         <div className="card-header">Goods issue/receipt</div>
         <div className="card-body">
