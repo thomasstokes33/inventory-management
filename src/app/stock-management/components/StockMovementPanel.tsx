@@ -41,7 +41,6 @@ async function fetchLocationFilteredChemicalOptions(inputLocation?: StockMovemen
     params.set(VALID_STOCK_GET_PARAMS.locId, parsedLocationId);
     params.set(VALID_STOCK_GET_PARAMS.distinctChem, String(true));
     const stocks = await fetchStocks(params);
-    console.log(stocks);
     return stocks.map(s => ({ value: s.chemicalId, label: s.chemical.name }));
 };
 
@@ -84,7 +83,7 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
     const [chem, setChem] = useState<null | StockMovementOption<ChemicalRecord>>(null);
     const [loc, setLoc] = useState<null | StockMovementOption<LocationRecord>>(null);
     const [movementType, setMovementType] = useState<null | StockMovementOption<MovementType>>(null);
-    const [costType, setCostType] = useState<null | StockMovementOption<CostType>>(null);
+    const [costType, setCostType] = useState<null | StockMovementOption<CostType>>(costTypeOptions.DISCARD[0]);
     const [moveDate, setMoveDate] = useState<Date | null>(null);
     const [supplier, setSupplier] = useState<null | StockMovementOption<SupplierRecord>>(null);
     const debouncedFetchChemicals = useFuncDebounce<string, StockMovementOption<MinimalChemical>>(fetchPermittedChemicalsOptions, 500);
@@ -112,12 +111,12 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
     const handleLocChange = (newLoc: StockMovementOption<LocationRecord> | null) => {
         setLoc(newLoc);
         if (!newLoc || !filteredLocationsOptions?.includes(newLoc)) setChem(null);
-        fetchLocationFilteredChemicalOptions(newLoc).then((ops) => { console.log("loc filtered", ops); setFilteredChemicalsOptions(ops); }); // Otherwise, get all chemicals that match the given location.
+        fetchLocationFilteredChemicalOptions(newLoc).then((ops) => setFilteredChemicalsOptions(ops)); // Otherwise, get all chemicals that match the given location.
     };
     const handleChemChange = (newChem: StockMovementOption<MinimalChemical> | null) => {
         setChem(newChem);
         if (!newChem || !filteredChemicalsOptions?.includes(newChem)) setLoc(null);
-        fetchChemicalFilteredLocationOptions(newChem).then(ops => { console.log(ops); setFilteredLocationsOptions(ops); });
+        fetchChemicalFilteredLocationOptions(newChem).then(ops =>  setFilteredLocationsOptions(ops));
     };
     const handleMovementTypeChange = (newMovType: StockMovementOption<MovementType> | null) => {
         setMovementType(newMovType);
