@@ -48,9 +48,12 @@ enum MovementType {
 
 
 enum CostType {
+    SELL // Positive
+    REFUND  // Positive
     PURCHASE
-    SELL
     TRANSFER
+    PRODUCE
+    RETURN // Postage
     NONE // For discarding or using.
 }
 model Location {

@@ -76,7 +76,7 @@ const costTypeOptions: { [K in MovementType]: StockMovementOption<CostType>[] } 
     TRANSFER_IN: [{ value: "TRANSFER", label: "N/A" }],
     TRANSFER_OUT: [{ value: "TRANSFER", label: "transfer" }],
     DISCARD: [{ value: "NONE", label: "N/A" }],
-    RETURN: [{ value: "NONE", label: "N/A" }, { value: "TRANSFER", label: "return cost" }],
+    RETURN: [{ value: "NONE", label: "N/A" }, { value: "REFUND", label: "return cost" }],
     PRODUCTION_MADE: [{ value: "NONE", label: "N/A" }],
     PRODUCTION_USE: [{ value: "PRODUCE", label: "production" }]
 };
