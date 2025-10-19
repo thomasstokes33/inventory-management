@@ -27,7 +27,7 @@ export  default async function IssueReceipt({ }) {
                 <StockDeletion stock={stocks}/>
             </div>
             <div className="col-md-6">
-                <StockMovementPanel suppliers={suppliers}/>
+                <StockMovementPanel suppliers={suppliers} stockCount={stocks.length}/>
             </div>
         </div>
     </div>);

@@ -19,6 +19,7 @@ import { StockMovementNonNested } from "@/schemas/stockMovement";
 import { toastifyFetch } from "@/lib/toastHelper";
 import { useRouter } from "next/navigation";
 type StockMovementOption<T> = T extends { id: number } ? { label: string, value: T["id"] } : { label: string, value: T };
+type StockMovementPanelProps = { suppliers: SupplierRecord[], stockCount: number };
     if (!res.ok) return [];
     else {
         const data = await res.json();
