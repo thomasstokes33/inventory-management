@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
             { code: { contains: locName } }
         ]
     };
+    where.archived = false;
     if (distinctChem) distinctFields.push("chemicalId");
     if (distinctLoc) distinctFields.push("locationId");
     const query: Prisma.StockFindManyArgs = {include: {chemical: true, location: true}};
