@@ -46,9 +46,7 @@ export async function GET(request: NextRequest) {
 }
 
 
-type FormError = string;
-const chemicalCreationSchema = chemicalSchema.pick({ name: true, quantityType: true, status: true, materialType: true, unit: true }).partial({ unit: true });
-type ChemicalCreation = z.infer<typeof chemicalCreationSchema>;
+type CreationError = string;
 export async function PUT(request: Request) {
     let formData : FormData;
     try {
@@ -68,35 +66,34 @@ export async function PUT(request: Request) {
     const chemical = await prisma.chemical.create({ data: { ...parsedChemical, hazardClass: { connect: formHazardClasses } } });
     return NextResponse.json({ data: chemical }, { status: 200 });
 }
-
-function validateChemical(newChemical: Record<string, string | string[]>): { valid: ChemicalCreation | null, errors: FormError[] } {
+function validateChemical(newChemical: Record<string, string | string[]>): { valid: ChemicalCreation | null, errors: CreationError[] } {
     const validatedChemical = chemicalCreationSchema.safeParse(newChemical);
-    const errors: FormError[] = [];
+    const errors: CreationError[] = [];
     if (validatedChemical.success) return { valid: validatedChemical.data, errors: [] };
     errors.push(z.prettifyError(validatedChemical.error));
     return { valid: null, errors: errors };
 }
 
-async function validateHazardClasses(formHazardClassIds: FormDataEntryValue[]): Promise<{ valid: { id: number }[], errors: FormError[] }> {
-    const errors: FormError[] = [];
-    const formHazardClasses: { id: number }[] = [];
+async function validateHazardClasses(creationHazardClassIds: number[]): Promise<{ valid: { id: number }[], errors: CreationError[] }> {
+    const errors: CreationError[] = [];
+    const outputHazardClasses: { id: number }[] = [];
     const dbHazardClasses = await prisma.hazardClass.findMany({ select: { id: true } });
     const validIds = new Set(dbHazardClasses.map(hc => hc.id)); // use Set for fast lookup
-    if (formHazardClassIds.length > validIds.size) {
-        errors.push("Too many hazard classes specificed.");
+    if (creationHazardClassIds.length > validIds.size) {
+        errors.push("Too many hazard classes specified.");
         return { valid: [], errors: errors };
     }
-    for (const hazardClass of formHazardClassIds) {
+    for (const hazardClass of creationHazardClassIds) {
         const hazardClassId = Number(hazardClass);
         if (isNaN(hazardClassId)) {
             errors.push("Invalid hazard class ID");
         } else if (!validIds.has(hazardClassId)) {
             errors.push("Invalid hazard class ID");
         } else {
-            formHazardClasses.push({ id: Number(hazardClass) });
+            outputHazardClasses.push({ id: Number(hazardClass) });
         }
     }
-    return { valid: formHazardClasses, errors: errors };
+    return { valid: outputHazardClasses, errors: errors };
 }
 
 function parseFormData(formData: FormData): Record<string, string | string[]> {
