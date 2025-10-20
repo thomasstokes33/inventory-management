@@ -3,18 +3,15 @@ import { ChemicalRecord, chemicalSchema } from "@/schemas/chemical";
 import { NextRequest, NextResponse } from "next/server";
 import z, { ZodError } from "zod";
 import { Prisma } from "@prisma/client";
-import { ApiResponse, generateResponse } from "@/lib/apiRoutes";
+import { ApiResponse, generateResponse, validId } from "@/lib/apiRoutes";
 const hazardClassOmittedChemicalSchema = chemicalSchema.omit({ createdAt: true, hazardClass: true });
 type ChemicalHazardClassOmitted = z.infer<typeof hazardClassOmittedChemicalSchema>;
 
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) : Promise<NextResponse<ApiResponse<ChemicalHazardClassOmitted>>>{
     const rawChemId = (await params).id;
-    // Handle zero length string, otherwise the chem ID becomes zero.
-    if (rawChemId === "") return generateResponse<ChemicalHazardClassOmitted>({ error: "Invalid ID" }, 400);
-    // Check ID is a number.
+    if (!validId(rawChemId)) return generateResponse({error: "Invalid OD"}, 400);
     const chemId = Number(rawChemId);
-    if (isNaN(chemId)) return generateResponse<ChemicalHazardClassOmitted>({ error: "Non string ID" }, 400);
     // Check JSON
     let body;
     try {
