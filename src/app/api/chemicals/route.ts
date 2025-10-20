@@ -67,6 +67,17 @@ export async function PUT(request: Request) {
     const chemical = await prisma.chemical.create({ data: { ...parsedChemical, hazardClass: { connect: formHazardClasses } } });
     return NextResponse.json({ data: chemical }, { status: 200 });
 }
+async function setupSynonyms(name: string, id: number) {
+    const response = await fetch(`https://api.datamuse.com/words?rel_syn=${name}`);
+    try {
+        const words: { word: string }[] = await response.json();
+        const newSynonyms: Omit<Synonym, "id">[] = words.map((w: { word: string }) => ({ chemicalId: id, synonym: w.word }));
+        const newItems = await prisma.synonym.createMany({ data: newSynonyms });
+        console.log(newItems);
+    } catch {
+        console.warn("Unexpected fetch issue");
+    }
+}
 function validateChemical(newChemical: Record<string, string | string[]>): { valid: ChemicalCreation | null, errors: CreationError[] } {
     const validatedChemical = chemicalCreationSchema.safeParse(newChemical);
     const errors: CreationError[] = [];
