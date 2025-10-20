@@ -86,6 +86,7 @@ model Chemical {
     materialType MaterialType
     hazardClass HazardClass[]
     stock Stock[]
+    synonyms Synonym[]
     @@index([name])
     @@index([createdAt])
 }
@@ -118,6 +119,15 @@ model StockMovement {
     cost Float @default(0)
     costType CostType @default(NONE)
     @@index([supplierId])
+}
+
+
+model Synonym {
+    id Int @id @default(autoincrement())
+    chemicalId Int
+    chemical Chemical @relation(fields: [chemicalId], references: [id])
+    synonym String
+    @@unique([chemicalId, synonym])
 }
 
 // TODO: Extend to include BOM, recipes and orders, which contain many StockMovements.
