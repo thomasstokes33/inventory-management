@@ -85,7 +85,7 @@ export function ChemicalRow({ item }: ChemicalRowProps) {
     };
     const archive = async () => {
         const archivedChemical = { ...chemical, status: "ARCHIVED" };
-        toastifyFetch(`${API_ROUTES.CHEMICALS}/${chemical.id}`, {
+        toastifyFetch(`${API_ROUTES.CHEMICALS}/${chemical.id}/archive`, {
             method: "POST",
             body: JSON.stringify(archivedChemical)
         }, {
