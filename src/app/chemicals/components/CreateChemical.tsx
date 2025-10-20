@@ -6,6 +6,8 @@ import { FormEvent } from "react";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { toastifyFetch } from "@/lib/toastHelper";
+import { chemicalCreationSchema, ChemicalCreationSchemaWithHazardClasses } from "@/schemas/chemical";
+import toast from "react-hot-toast";
 type CreateChemicalProps = { hazardClasses: HazardClass[] }
 export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
     const router = useRouter();
@@ -13,9 +15,27 @@ export default function CreateChemical({ hazardClasses }: CreateChemicalProps) {
         e.preventDefault();
         const form = e.currentTarget;
         const formData = new FormData(form);
+        const hazardClassesRaw = formData.getAll("hazardClass");
+        const hazardClasses : number[] = [];
+        for (const haz of hazardClassesRaw) {
+            if (haz instanceof File) break;
+            else hazardClasses.push(Number(haz));
+        }
+        const newChem : ChemicalCreationSchemaWithHazardClasses= {
+            materialType: formData.get("materialType") as MaterialType,
+            name: String(formData.get("name")),
+            quantityType: formData.get("quantityType") as QuantityType,
+            status: formData.get("status") as Status,
+            unit: formData.get("unit") as string | null,
+            hazardClassIds: hazardClasses
+        };
+        if (chemicalCreationSchema.safeParse(newChem).error) {
+            toast.error("incorrect parameters");
+            return;
+        }
         toastifyFetch(API_ROUTES.CHEMICALS, {
             method: "PUT",
-            body: formData
+            body: JSON.stringify(newChem)
         }, {
             error: "Could not create chemical",
             success: "Successfully added chemical",

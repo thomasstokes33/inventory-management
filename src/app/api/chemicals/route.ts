@@ -49,22 +49,24 @@ export async function GET(request: NextRequest) {
 
 type CreationError = string;
 export async function PUT(request: Request) {
-    let formData : FormData;
+    let body;
     try {
-        formData = await request.formData();
+        body = await request.json();
     } catch {
         return NextResponse.json({ error: "Incorrect format" }, { status: 400 });
     }
-    const newChemical: Record<string, string | string[]> = parseFormData(formData);
-    const formHazardClassIds = formData.getAll("hazardClass");  // Each item is a hazard class ID number.
-    const { valid: formHazardClasses, errors: hazardErrors } = await validateHazardClasses(formHazardClassIds);
+    const { hazardClassIds, unit, ...newChemical } = body;
+    let revisedUnit = unit;
+    if (!unit) revisedUnit = null;
     const { valid: parsedChemical, errors: parsingErrors } = validateChemical(newChemical);
+    const { valid: formHazardClasses, errors: hazardErrors } = await validateHazardClasses(hazardClassIds);
     const errors = [...hazardErrors, ...parsingErrors];
     if (!parsedChemical || errors.length > 0) {
         console.warn({errors});
         return NextResponse.json({ errors }, { status: 400 });
     }
-    const chemical = await prisma.chemical.create({ data: { ...parsedChemical, hazardClass: { connect: formHazardClasses } } });
+    const chemical = await prisma.chemical.create({ data: { ...parsedChemical, unit: revisedUnit, hazardClass: { connect: formHazardClasses } } });
+    await setupSynonyms(chemical.name,chemical.id);
     return NextResponse.json({ data: chemical }, { status: 200 });
 }
 async function setupSynonyms(name: string, id: number) {
@@ -106,16 +108,4 @@ async function validateHazardClasses(creationHazardClassIds: number[]): Promise<
         }
     }
     return { valid: outputHazardClasses, errors: errors };
-}
-
-function parseFormData(formData: FormData): Record<string, string | string[]> {
-    const result: Record<string, string | string[]> = {};
-    for (const pair of formData) {
-        if (typeof pair[1] == "string" && pair[1].length > 0) {
-            result[pair[0]] = pair[1];
-        } else {
-            console.warn(`Skipping field: ${pair[0]}`);
-        }
-    }
-    return result;
 }
