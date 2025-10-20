@@ -1,7 +1,7 @@
 import { generateResponse } from "@/lib/apiRoutes";
 import prisma from "@/lib/prisma";
-import { chemicalSchema } from "@/schemas/chemical";
-import { Chemical, Status } from "@prisma/client";
+import { ChemicalCreation, chemicalCreationSchema } from "@/schemas/chemical";
+import { Chemical, Status, Synonym } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 const MAX_QUERY_LENGTH = 15;
@@ -33,18 +33,19 @@ export async function GET(request: NextRequest) {
         const trimmedSearch = query.trim();
         const chemicals = await prisma.chemical.findMany({
             take: MAX_CHEMICALS_RETURNED,
-            select: { id: true, name: true },
             where: {
                 status: { not: "ARCHIVED" },
-                OR: [{ name: { contains: trimmedSearch.toLowerCase() } },
-                { status: { in: Object.values(Status).filter(status => status.toLowerCase().includes(trimmedSearch)) } }
+                OR: [
+                    { name: { contains: trimmedSearch.toLowerCase() } },
+                    { status: { in: Object.values(Status).filter(status => status.toLowerCase().includes(trimmedSearch)) } },
+                    { synonyms: { some: { synonym: { contains: trimmedSearch.toLowerCase() } } } }
                 ]
-            }
+            },
+            include: { synonyms: true }
         });
-        return generateResponse<MinimalChemical[]>({data: chemicals}, 200);
+        return generateResponse({ data: chemicals }, 200);
     }
 }
-
 
 type CreationError = string;
 export async function PUT(request: Request) {
