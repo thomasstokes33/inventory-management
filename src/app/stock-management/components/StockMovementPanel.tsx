@@ -1,7 +1,7 @@
 "use client";
 
 import { CostType, MovementType } from "@prisma/client";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import Select, { Options } from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
@@ -17,7 +17,7 @@ import { MinimalChemical } from "@/app/api/chemicals/route";
 import { formatLocation } from "@/lib/formatter";
 import { StockMovementCreationSchema, StockMovementNonNested } from "@/schemas/stockMovement";
 import { toastifyFetch } from "@/lib/toastHelper";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 type StockMovementOption<T> = T extends { id: number } ? { label: string, value: T["id"] } : { label: string, value: T };
 type StockMovementPanelProps = { suppliers: SupplierRecord[], stockCount: number };
@@ -81,6 +81,8 @@ const costTypeOptions: { [K in MovementType]: StockMovementOption<CostType>[] } 
     PRODUCTION_USE: [{ value: "PRODUCE", label: "production" }]
 };
 export default function StockMovementPanel({ suppliers, stockCount }: StockMovementPanelProps) {
+    const searchParams = useSearchParams();
+    const preliminaryChemId = searchParams.get("chemical");
     const [chem, setChem] = useState<null | StockMovementOption<ChemicalRecord>>(null);
     const [loc, setLoc] = useState<null | StockMovementOption<LocationRecord>>(null);
     const [movementType, setMovementType] = useState<null | StockMovementOption<MovementType>>(null);
@@ -94,7 +96,7 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
     const [filteredLocationsOptions, setFilteredLocationsOptions] = useState<null | StockMovementOption<LocationRecord>[]>(null);
     const filteredCostTypeOptions = movementType ? costTypeOptions[movementType.value] : [];
     const supplierOptions: Options<StockMovementOption<SupplierRecord>> = suppliers.map(sup => ({ value: sup.id, label: sup.name }));
-    const reset = async () => {
+    const reset = useCallback(async () => {
         setChem(null);
         setLoc(null);
         setMovementType(null);
@@ -102,29 +104,33 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
         setMoveDate(null);
         fetchPermittedLocationOptions("").then(setFilteredLocationsOptions);
         fetchPermittedChemicalsOptions("").then(setFilteredChemicalsOptions); // If there are no options, get all chemicals in the stock table.
-    };
-    useEffect(() => {
-        fetchPermittedChemicalsOptions("").then(setFilteredChemicalsOptions); // If there are no options, get all chemicals in the stock table.
-    }, [stockCount]);
+    }, []);
     useEffect(() => {
         fetchPermittedLocationOptions("").then(setFilteredLocationsOptions);
-    }, [stockCount]);
-    const handleLocChange = (newLoc: StockMovementOption<LocationRecord> | null) => {
+        fetchPermittedChemicalsOptions("").then(filteredChemOps => {
+            setFilteredChemicalsOptions(filteredChemOps);
+            if (preliminaryChemId) {
+                const [uniqueOp] = filteredChemOps.filter(c => c.value === Number(preliminaryChemId));
+                if (uniqueOp) setChem(uniqueOp);
+            }
+        });
+    }, [stockCount, preliminaryChemId]);
+    const handleLocChange = useCallback((newLoc: StockMovementOption<LocationRecord> | null) => {
         setLoc(newLoc);
         if (!newLoc || !filteredLocationsOptions?.includes(newLoc)) setChem(null);
-        fetchLocationFilteredChemicalOptions(newLoc).then((ops) => setFilteredChemicalsOptions(ops)); // Otherwise, get all chemicals that match the given location.
-    };
-    const handleChemChange = (newChem: StockMovementOption<MinimalChemical> | null) => {
+        fetchLocationFilteredChemicalOptions(newLoc).then((ops) => setFilteredChemicalsOptions(ops)); // Get all chemicals that match the given location.
+    }, [filteredLocationsOptions]);
+    const handleChemChange = useCallback((newChem: StockMovementOption<MinimalChemical> | null) => {
         setChem(newChem);
         if (!newChem || !filteredChemicalsOptions?.includes(newChem)) setLoc(null);
-        fetchChemicalFilteredLocationOptions(newChem).then(ops =>  setFilteredLocationsOptions(ops));
-    };
-    const handleMovementTypeChange = (newMovType: StockMovementOption<MovementType> | null) => {
+        fetchChemicalFilteredLocationOptions(newChem).then(ops => setFilteredLocationsOptions(ops));
+    }, [filteredChemicalsOptions]);
+    const handleMovementTypeChange = useCallback((newMovType: StockMovementOption<MovementType> | null) => {
         setMovementType(newMovType);
         if (newMovType?.value) {
             setCostType(costTypeOptions[newMovType.value][0]);
         }
-    };
+    }, []);
     const submitHandler = async (formEvent: FormEvent<HTMLFormElement>) => {
         const form = formEvent.currentTarget;
         formEvent.preventDefault();
