@@ -4,12 +4,12 @@ import useDebounce from "@/app/hooks/useDebounce";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { formatQuantity } from "@/lib/formatter";
 import { toastifyFetch } from "@/lib/toastHelper";
-import { ChemicalRecordWithTotalStock } from "@/schemas/chemical";
+import { ChemicalRecordWithTotalStockAndSynonyms } from "@/schemas/chemical";
 import { MaterialType, Status } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type ChemicalRowData = ChemicalRecordWithTotalStock;
+type ChemicalRowData = ChemicalRecordWithTotalStockAndSynonyms;
 export const chemicalTableColumns: TableColumn<ChemicalRowData>[] = [
     { field: "name", label: "Name" },
     {
@@ -50,17 +50,15 @@ export default function ChemicalsTable({ initialChems }: ChemicalsTableProps) {
     const debouncedVal = useDebounce<string>(searchVal, 1000);
     const items = initialChems.filter((item) => {
         return chemicalTableColumns.some(({ field }) => {
-            const filterOn = item[field];
-            let found = false;
             const lowerCaseFilterVal = debouncedVal.toLowerCase();
-            if (filterOn == null) {  // Includes null and undefined.
-                found = false;
-            } else if (Array.isArray(filterOn)) {
-                found = filterOn.some((val) => val.classification.toLowerCase().includes(lowerCaseFilterVal));
-            } else {
-                found = String(filterOn).toLowerCase().includes(lowerCaseFilterVal);
-            }
-            return found;
+            const hazardClassContains = item.hazardClass.some((val) => val.classification.toLowerCase().includes(lowerCaseFilterVal));
+            if (hazardClassContains) return true;
+            const synonymsContains = item.synonyms.some(val => val.synonym.toLowerCase().includes(lowerCaseFilterVal));
+            if (synonymsContains) return true;
+            const filterOn = item[field];
+            if (filterOn == null) return false;
+            if (String(filterOn).toLowerCase().includes(lowerCaseFilterVal)) return true;
+            return false;
         });
     });
     return (

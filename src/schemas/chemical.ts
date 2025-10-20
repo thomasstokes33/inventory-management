@@ -14,8 +14,8 @@ export const chemicalSchema = z.object({
     updatedAt: z.date()
 });
 
-export const chemicalSchemaWithTotalStock = chemicalSchema.extend({totalQuantity: z.number().nonnegative()});
-export type ChemicalRecordWithTotalStock = z.infer<typeof chemicalSchemaWithTotalStock>;
+export const chemicalSchemaWithTotalStockAndSynonyms = chemicalSchema.extend({ totalQuantity: z.number().nonnegative(), synonyms: z.array(z.object({synonym: z.string()}))});
+export type ChemicalRecordWithTotalStockAndSynonyms = z.infer<typeof chemicalSchemaWithTotalStockAndSynonyms>;
 export type ChemicalRecord = z.infer<typeof chemicalSchema>;
 
 export const chemicalCreationSchema = chemicalSchema.pick({

@@ -1,16 +1,16 @@
 import prisma from "@/lib/prisma";
 import ChemicalsTable from "./components/ChemicalsTable";
 import CreateChemical from "./components/CreateChemical";
-import { ChemicalRecordWithTotalStock, chemicalSchemaWithTotalStock } from "@/schemas/chemical";
+import { ChemicalRecordWithTotalStock, chemicalSchemaWithTotalStockAndSynonyms } from "@/schemas/chemical";
 
 export default async function ChemicalDashboard() {
     const initialRawChems = await prisma.chemical.findMany({
-        include: {hazardClass: true, stock: {select: {stockQuantity: true}}},
+        include: {hazardClass: true, synonyms: {select: {synonym: true}}, stock: {select: {stockQuantity: true}}},
         where: {status: {not: "ARCHIVED"}} 
     });
     const hazardClasses = await prisma.hazardClass.findMany();
     const initialRawChemsWithTotalQuantity = initialRawChems.map(chem => {return { ...chem, totalQuantity: chem.stock.reduce((accum, stock) => accum + stock.stockQuantity, 0) };});
-    const initialChems : ChemicalRecordWithTotalStock[] = initialRawChemsWithTotalQuantity.map(chem => chemicalSchemaWithTotalStock.parse(chem));
+    const initialChems : ChemicalRecordWithTotalStock[] = initialRawChemsWithTotalQuantity.map(chem => chemicalSchemaWithTotalStockAndSynonyms.parse(chem));
     return (
         <div className="container-lg mt-5">
             <div className="row">
