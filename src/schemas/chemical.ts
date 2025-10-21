@@ -1,20 +1,32 @@
 import z from "zod";
-import { QuantityType, Status } from "@prisma/client";
-import { supplierSchema } from "./supplier";
-import { HazardSchema } from "./hazardClass";
-import { LocationSchema } from "./location";
-
+import { MaterialType, QuantityType, Status } from "@prisma/client";
+import { hazardSchema } from "./hazardClass";
 
 export const chemicalSchema = z.object({
-    id: z.number().nonnegative().describe("id"),
-    name: z.string().describe("name"),
-    stockQuantity: z.number().nonnegative().describe("stock"),
-    quantityType: z.enum(QuantityType),
-    unit: z.string().nullable().describe("Special unit if it is unusual, such as sticks or bars, rather than grams."),
+    id: z.number().nonnegative(),
+    name: z.string().toLowerCase(),
     status: z.enum(Status),
-    location: LocationSchema.nullable(),
-    supplier: supplierSchema,
-    hazardClass: z.array(HazardSchema)
+    hazardClass: z.array(hazardSchema),
+    quantityType: z.enum(QuantityType),
+    materialType: z.enum(MaterialType),
+    unit: z.string().nullable(),
+    createdAt: z.date(),
+    updatedAt: z.date()
 });
 
-export type ChemicalRow = z.infer<typeof chemicalSchema>;
+export const chemicalSchemaWithTotalStockAndSynonyms = chemicalSchema.extend({ totalQuantity: z.number().nonnegative(), synonyms: z.array(z.object({synonym: z.string()}))});
+export type ChemicalRecordWithTotalStockAndSynonyms = z.infer<typeof chemicalSchemaWithTotalStockAndSynonyms>;
+export type ChemicalRecord = z.infer<typeof chemicalSchema>;
+
+export const chemicalCreationSchema = chemicalSchema.pick({
+    name: true,
+    quantityType: true,
+    status: true,
+    materialType: true,
+    unit: true
+}).partial({ unit: true });
+export type ChemicalCreation = z.infer<typeof chemicalCreationSchema>;
+export const chemicalCreationSchemaWithHazardClasses = chemicalCreationSchema.extend({
+    hazardClassIds: z.array(z.number())
+});
+export type ChemicalCreationSchemaWithHazardClasses = z.infer<typeof chemicalCreationSchemaWithHazardClasses>;

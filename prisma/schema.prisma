@@ -11,49 +11,13 @@ datasource db {
 }
 
 
-model Supplier {
-    id Int @id @default(autoincrement())
-    name String
-    email String @unique
-    chemicals Chemical[]
-}
-
-model Chemical {
-    id Int @id @default(autoincrement())
-    name String
-    nomenclatureName String?
-    stockQuantity Float // Float chosen to allow fractional quantities. Only use one unit for different states of material (ie. g for solid, ml for liquids. these can be converted client side to more readable units.)
-    quantityType QuantityType 
-    unit String? // Allows for extra details (e.g. cinammon "sticks")
-    createdAt DateTime @default(now())
-    modifiedAt DateTime @updatedAt
-    status Status
-    supplierId Int
-    supplier Supplier @relation(fields: [supplierId], references: [id])
-    locationId Int?  // Optional as it may not yet be approved.
-    location Location? @relation(fields: [locationId], references: [id])
-    hazardClassId Int?  // May not be hazardous.
-    hazardClass HazardClass[]
-    @@index([name])
-    @@index([status])
-}
-
-model Location {
-    id Int @id @default(autoincrement())
-    address String
-    code    String  // Post code, zip code.
-    town    String?
-    country String?
-    chemicals Chemical[]
-}
-
 model HazardClass {
     id Int @id @default(autoincrement())
     classification String
     chemicals Chemical[]
 }
 
-
+// Makes unit management easier
 enum QuantityType {
     MASS
     VOLUME
@@ -61,8 +25,109 @@ enum QuantityType {
 }
 
 enum Status {
-    REQUESTED
+    PENDING
     APPROVED
-    DISPENSED  // Item is in use.
     ARCHIVED
 }
+
+enum MaterialType {
+    RAW
+    FINAL
+}
+
+enum MovementType {
+    ISSUE // Goods out. Includes used, sold or wasted.
+    RECEIPT
+    TRANSFER_OUT
+    TRANSFER_IN
+    PRODUCTION_USE
+    PRODUCTION_MADE
+    DISCARD
+    RETURN
+}
+
+
+enum CostType {
+    SELL // Positive
+    REFUND  // Positive
+    PURCHASE
+    TRANSFER
+    PRODUCE
+    RETURN // Postage
+    NONE // For discarding or using.
+}
+model Location {
+    id Int @id @default(autoincrement())
+    address String
+    code    String  // Post code, zip code.
+    bin     String? // location within site.
+    town    String?
+    country String?
+    stock Stock[]
+    @@index([country])
+}
+
+model Supplier {
+    id Int @id @default(autoincrement())
+    name String
+    email String @unique
+    stockMovement StockMovement[]
+}
+
+model Chemical {
+    id Int @id @default(autoincrement())
+    name String
+    nomenclatureName String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    status Status
+    quantityType QuantityType 
+    unit String? // Allows for extra details (e.g. cinammon "sticks")
+    materialType MaterialType
+    hazardClass HazardClass[]
+    stock Stock[]
+    synonyms Synonym[]
+    @@index([name])
+    @@index([createdAt])
+}
+
+model Stock {
+    id Int @id @default(autoincrement())
+    chemicalId Int
+    chemical Chemical @relation(fields: [chemicalId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    locationId Int
+    location Location @relation(fields: [locationId], references: [id])
+    stockQuantity Float // Float chosen to allow fractional quantities. Only use one unit for different states of material (ie. g for solid, ml for liquids. these can be converted client side to more readable units.)
+    stockMovement StockMovement[]
+    archived Boolean @default(false) // Indicates a stock is no longer valid.
+    @@index([locationId])
+    @@index([chemicalId])
+    @@unique([chemicalId, locationId])
+}
+
+model StockMovement {
+    id Int @id @default(autoincrement())
+    createdAt DateTime @default(now()) // No modified as it is "immutable"
+    quantity Float
+    movementType MovementType
+    supplierId Int?
+    supplier Supplier? @relation(fields: [supplierId], references: [id]) // Assumes single supplier for a stock at a location.
+    stockId Int
+    stock Stock @relation(fields: [stockId], references: [id])
+    cost Float @default(0)
+    costType CostType @default(NONE)
+    @@index([supplierId])
+}
+
+
+model Synonym {
+    id Int @id @default(autoincrement())
+    chemicalId Int
+    chemical Chemical @relation(fields: [chemicalId], references: [id])
+    synonym String
+    @@unique([chemicalId, synonym])
+}
+
+// TODO: Extend to include BOM, recipes and orders, which contain many StockMovements.
