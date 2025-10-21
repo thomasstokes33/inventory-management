@@ -1,6 +1,8 @@
 # Inventory Management System
 
 This is a web-based Inventory Management System built with modern web technologies. The project is intended to provide a simple interface to manage chemicals and other inventory items, with full database interaction and type-safe validation.
+
+
 <img src="chemical-editing-edited.jpg" width="400px">
 
 ## Features (so far)
