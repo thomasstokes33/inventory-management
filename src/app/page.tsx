@@ -1,10 +1,10 @@
-import Image from "next/image";
 import styles from "./page.module.css";
 import { ChemicalRecord, chemicalSchema } from "@/schemas/chemical";
 import prisma from "@/lib/prisma";
 import CountCard from "./components/CountCard";
 import StatsCard from "./components/StatsCard";
 
+export const revalidate = 30;
 
 
 export default async function Home() {
