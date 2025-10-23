@@ -13,7 +13,7 @@ export const stockMovementSchema = z.object({
     movementType: z.enum(MovementType),
     stockId: z.number().nonnegative(),
     stock: stockSchema,
-    cost: z.number().optional(),
+    cost: z.number().nonnegative().optional(),
     costType: z.enum(CostType),
 });
 
