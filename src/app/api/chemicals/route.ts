@@ -19,7 +19,6 @@ async function getInitialChemicalsResponse() {
 export const VALID_CHEMICAL_GET_PARAMS= {query: "query"} as const;
 export async function GET(request: NextRequest) {
     const searchParams: URLSearchParams = request.nextUrl.searchParams;
-    console.log(searchParams);
     if (searchParams.size == 0) {
         return getInitialChemicalsResponse();
     } else {

@@ -23,7 +23,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         ]);
         return generateResponse({data: {stock: stock, chemical: chemical}},200);
     } catch {
-        console.log("here");
         return generateResponse({error: "Invalid IDs"}, 400);
     }
 

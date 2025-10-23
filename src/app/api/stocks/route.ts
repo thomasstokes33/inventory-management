@@ -23,7 +23,6 @@ function parseDistinct(input: string | null) {
 export const VALID_STOCK_GET_PARAMS = {distinctChem: "distinctChem" , distinctLoc: "distinctLoc", locId: "locationId", chemId: "chemicalId", chemicalName: "chemical", locationName: "location" } as const;
 export async function GET(req: NextRequest) {
     const searchParams: URLSearchParams = req.nextUrl.searchParams; // Automatically decodes params.
-    console.log(searchParams);
     const getParam = <T>(key: keyof typeof VALID_STOCK_GET_PARAMS, parser: (val: string | null) => T ) => {
         return parser(searchParams.get(VALID_STOCK_GET_PARAMS[key]));
     };
@@ -36,7 +35,6 @@ export async function GET(req: NextRequest) {
     type StockKeys = keyof Stock;
     const distinctFields : StockKeys[] = [];
     const where: Prisma.StockWhereInput = {};
-    console.log(locId);
     if (chemId !== undefined) where.chemicalId = chemId;
     if (locId !== undefined) where.locationId = locId;
     if (chemName !== undefined) where.chemical = { name: { contains: chemName } };
