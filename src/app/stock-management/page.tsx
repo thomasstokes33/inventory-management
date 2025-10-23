@@ -6,6 +6,7 @@ import StockDeletion from "./components/StockDeletion";
 import { stockSchema } from "@/schemas/stock";
 import StockMovementPanel from "./components/StockMovementPanel";
 import { supplierSchema } from "@/schemas/supplier";
+import { Suspense } from "react";
 export  default async function IssueReceipt({ }) {
     const rawLocations = await prisma.location.findMany();
     const rawStock = await prisma.stock.findMany({ where: { archived: { equals: false } },
@@ -25,7 +26,9 @@ export  default async function IssueReceipt({ }) {
                 <StockDeletion stock={stocks}/>
             </div>
             <div className="col-md-6">
+            <Suspense fallback={<div>Loading...</div>}>
                 <StockMovementPanel suppliers={suppliers} stockCount={stocks.length}/>
+            </Suspense>
             </div>
         </div>
     </div>);
