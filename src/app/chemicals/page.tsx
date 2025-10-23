@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import ChemicalsTable from "./components/ChemicalsTable";
 import CreateChemical from "./components/CreateChemical";
 import { ChemicalRecordWithTotalStockAndSynonyms, chemicalSchemaWithTotalStockAndSynonyms } from "@/schemas/chemical";
+export const revalidate = 0;
 
 export default async function ChemicalDashboard() {
     const initialRawChems = await prisma.chemical.findMany({

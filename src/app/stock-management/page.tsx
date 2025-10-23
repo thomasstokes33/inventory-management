@@ -7,6 +7,7 @@ import { stockSchema } from "@/schemas/stock";
 import StockMovementPanel from "./components/StockMovementPanel";
 import { supplierSchema } from "@/schemas/supplier";
 import { Suspense } from "react";
+export const revalidate = 0;
 export  default async function IssueReceipt({ }) {
     const rawLocations = await prisma.location.findMany();
     const rawStock = await prisma.stock.findMany({ where: { archived: { equals: false } },
