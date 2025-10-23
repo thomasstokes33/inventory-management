@@ -203,7 +203,7 @@ export default function StockMovementPanel({ suppliers, stockCount }: StockMovem
                         {/* Cost type is limitied by the movement type. ISSUE is only purchase */}
                         <Select instanceId="cost-type" id="cost-type" options={filteredCostTypeOptions} value={costType} onChange={setCostType} />
                         <label htmlFor="cost">Cost</label>
-                        <input className="form-control" id="cost" name="cost" type="number" defaultValue={0} required></input>
+                        <input className="form-control" id="cost" name="cost" type="number" step="any" defaultValue={0} required></input>
                     </div>}
                     {movementType?.value === "RECEIPT" && <>
                         <label htmlFor="supplier">Supplier</label>
